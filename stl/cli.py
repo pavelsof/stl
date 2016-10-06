@@ -28,11 +28,13 @@ def main():
 	parser_start = subparsers.add_parser('start')
 	parser_start.add_argument('task', nargs='?',
 		help='the task that you are about to start working on')
+	parser_start.add_argument('-v', '--verbose', action='store_true')
 	parser_start.set_defaults(func=start)
 	
 	parser_stop = subparsers.add_parser('stop')
 	parser_stop.add_argument('task', nargs='?',
 		help='the task you are about to stop working on')
+	parser_stop.add_argument('-v', '--verbose', action='store_true')
 	parser_stop.set_defaults(func=stop)
 	
 	args = parser.parse_args()
