@@ -1,0 +1,5 @@
+meta/*
+stl.egg-info/*
+
+*.pyc
+*.swp
