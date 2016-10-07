@@ -8,10 +8,14 @@ import os
 
 
 """
-The str(f|p)time formats used in the database files.
+The str(f|p)time formats used in the database files and the expected lengths of
+the formatted strings.
 """
 DT_FORMAT_FULL = '%Y-%m-%d %H:%M'
+DT_FORMAT_FULL_LEN = 16
+
 DT_FORMAT_SHORT = '%d %H:%M'
+DT_FORMAT_SHORT_LEN = 8
 
 
 
@@ -46,7 +50,7 @@ class Database:
 		Returns the absolute path to the file containing the logs for the given
 		year and month.
 		"""
-		year_dir = os.path.join(self.dir_path, str(year))
+		year_dir = os.path.join(self.dir_path, str(year).zfill(4))
 		
 		if create and not os.path.exists(year_dir):
 			try:
@@ -59,6 +63,14 @@ class Database:
 		return os.path.join(year_dir, str(month).zfill(2))
 	
 	
+	def _sanitise_text(self, text):
+		"""
+		Prepares the given text for writing to a database file. Also, the NUL
+		byte is removed as it breaks the csv reader.
+		"""
+		return text.replace('\0', '').strip()
+	
+	
 	def add_current(self, stamp, text=''):
 		"""
 		Creates a new open log entry. Expects a datetime instance with the time
@@ -67,13 +79,17 @@ class Database:
 		Note that the contents of the `current` file are overwritten.
 		"""
 		path = os.path.join(self.dir_path, 'current')
-		line = [stamp.strftime(DT_FORMAT_FULL), text]
 		
-		with open(path, 'w') as f:
+		entry = [
+			stamp.strftime(DT_FORMAT_FULL).zfill(DT_FORMAT_FULL_LEN),
+			self._sanitise_text(text)
+		]
+		
+		with open(path, 'w', newline='') as f:
 			writer = csv.writer(f, delimiter='\t')
-			writer.writerow(line)
+			writer.writerow(entry)
 		
-		self.log.debug('Added an open log entry: '+str(line))
+		self.log.debug('Added an open log entry: '+str(entry))
 	
 	
 	def get_current(self, delete=False):
@@ -90,7 +106,7 @@ class Database:
 		entry = {'stamp': None, 'text': None}
 		lines = []
 		
-		with open(path, 'r') as f:
+		with open(path, 'r', newline='') as f:
 			reader = csv.reader(f, delimiter='\t')
 			for line in reader:
 				lines.append(line)
@@ -110,54 +126,60 @@ class Database:
 		entry['text'] = lines[0][1] if lines[0][1] else ''
 		
 		if delete:
-			with open(path, 'w') as f:
+			with open(path, 'w', newline='') as f:
 				pass
 		
 		return entry
 	
 	
-	def add(self, stamp, action, text):
+	def add_complete(self, start, stop, text=''):
 		"""
-		Creates a new log entry.
+		Creates a new closed log entry. Expects two datetime instances, for
+		when work on the task started and stopped, respectively. The text
+		argument is optional.
 		"""
-		path = self._get_path(stamp.year, stamp.month, create=True)
+		entry = [
+			start.strftime(DT_FORMAT_SHORT),
+			stop.strftime(DT_FORMAT_SHORT),
+			self._sanitise_text(text)
+		]
+		
+		path = self._get_path(start.year, start.month, create=True)
 		data = []
 		
 		if os.path.exists(path):
-			with open(path) as f:
+			with open(path, 'r', newline='') as f:
 				reader = csv.reader(f, delimiter='\t')
-				for line in f:
+				for line in reader:
 					data.append(line)
 		
-		data.append([
-			
-		])
+		data.append(entry)
 		
-		with open(path, 'w') as f:
+		with open(path, 'w', newline='') as f:
 			writer = csv.writer(f, delimiter='\t')
 			for line in data:
 				writer.writerow(line)
 		
-		self.log.debug('Added log entry: ')
+		self.log.debug('Added log entry: '+str(entry))
 	
 	
 	def get_day(self, year, month, day):
 		"""
-		Returns the set of logs for the given date.
+		Returns the set of closed log entries for the given date.
 		"""
 		pass
 	
 	
 	def get_month(self, year, month):
 		"""
-		Returns the set of logs for the given month.
+		Returns the set of closed log entries for the given month.
 		"""
 		pass
 	
 	
 	def get_year(self, year):
 		"""
-		Returns the set of logs for the given year.
+		Returns the set of closed log entries for the given year.
 		"""
 		pass
 
