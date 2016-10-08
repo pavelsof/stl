@@ -23,6 +23,10 @@ def main():
 	parser_stop.add_argument('-v', '--verbose', action='store_true')
 	parser_stop.set_defaults(func='stop')
 	
+	parser_status = subparsers.add_parser('status')
+	parser_status.add_argument('-v', '--verbose', action='store_true')
+	parser_status.set_defaults(func='status')
+	
 	args = parser.parse_args()
 	if 'func' not in args:
 		parser.print_help()

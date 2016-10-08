@@ -5,6 +5,7 @@ import logging
 import os
 
 from stl.db import DatabaseError, Database
+from stl.utils import get_natural_str
 
 
 
@@ -116,9 +117,12 @@ class Core:
 		if curr is None:
 			s = 'Nothing to see here'
 		else:
+			delta = datetime.now() - curr['stamp']
+			
 			if curr['task']:
-				s += 'Task: '+curr['task']
-			s += 'Started: '+str(curr['stamp'])
+				s += 'Task: '+curr['task']+'\n'
+			s += 'Started: '+str(curr['stamp'])+'\n'
+			s += 'Elapsed: '+get_natural_str(delta)
 		
 		return s
 	
