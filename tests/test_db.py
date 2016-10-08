@@ -44,7 +44,7 @@ class DatabaseTestCase(TestCase):
 		
 		entry = self.db.get_current()
 		self._check_dt_equal(entry['stamp'], dt)
-		self.assertEqual(entry['tag'], self.db._sanitise_text(t))
+		self.assertEqual(entry['task'], self.db._sanitise_text(t))
 		
 		path = os.path.join(self.temp_dir.name, 'current')
 		self.assertTrue(os.path.exists(path))
@@ -74,7 +74,7 @@ class DatabaseTestCase(TestCase):
 	@given(lists(fixed_dictionaries({
 			'start': datetimes(min_year=2000, max_year=2000, timezones=[]),
 			'stop': datetimes(min_year=2000, max_year=2000, timezones=[]),
-			'tag': text()})))
+			'task': text()})))
 	def test_get_month(self, li):
 		li = list(sorted(li, key=lambda d: d['start']))
 		
@@ -82,7 +82,7 @@ class DatabaseTestCase(TestCase):
 			self.assertEqual(self.db.get_month(2000, month), [])
 		
 		for d in li:
-			self.db.add_complete(d['start'], d['stop'], d['tag'])
+			self.db.add_complete(d['start'], d['stop'], d['task'])
 		
 		for month in range(1, 13):
 			li_ = list(filter(lambda d: d['start'].month == month, li))
@@ -91,7 +91,7 @@ class DatabaseTestCase(TestCase):
 			for i, entry in enumerate(entries):
 				self._check_dt_equal(entry['start'], li_[i]['start'])
 				self._check_dt_equal(entry['stop'], li_[i]['stop'])
-				self.assertEqual(entry['tag'], self.db._sanitise_text(li_[i]['tag']))
+				self.assertEqual(entry['task'], self.db._sanitise_text(li_[i]['task']))
 		
 		year_dir = os.path.join(self.temp_dir.name, '2000')
 		if os.path.exists(year_dir):
@@ -101,21 +101,21 @@ class DatabaseTestCase(TestCase):
 	@given(lists(fixed_dictionaries({
 			'start': datetimes(min_year=2000, max_year=2000, timezones=[]),
 			'stop': datetimes(min_year=2000, max_year=2000, timezones=[]),
-			'tag': text()})))
+			'task': text()})))
 	def test_get_year(self, li):
 		li = list(sorted(li, key=lambda d: d['start']))
 		
 		self.assertEqual(self.db.get_year(2000), [])
 		
 		for d in li:
-			self.db.add_complete(d['start'], d['stop'], d['tag'])
+			self.db.add_complete(d['start'], d['stop'], d['task'])
 		
 		entries = self.db.get_year(2000)
 		self.assertEqual(len(entries), len(li))
 		for i, entry in enumerate(entries):
 			self._check_dt_equal(entry['start'], li[i]['start'])
 			self._check_dt_equal(entry['stop'], li[i]['stop'])
-			self.assertEqual(entry['tag'], self.db._sanitise_text(li[i]['tag']))
+			self.assertEqual(entry['task'], self.db._sanitise_text(li[i]['task']))
 		
 		year_dir = os.path.join(self.temp_dir.name, '2000')
 		if os.path.exists(year_dir):
