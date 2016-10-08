@@ -71,24 +71,24 @@ class Database:
 	def _read_entry(self, line):
 		"""
 		De-serialises a raw closed log file line and returns {start, stop,
-		text}, the first two being naive datetime instances.
+		tag}, the first two being naive datetime instances.
 		"""
 		try:
 			assert len(line) == 3
 			start = datetime.strptime(line[0], DT_FORMAT)
 			stop = datetime.strptime(line[1], DT_FORMAT)
-			text = str(line[2])
+			tag = str(line[2])
 		except (AssertionError, ValueError) as err:
 			self.log.error(str(err))
 			raise ValueError
 		
-		return {'start': start, 'stop': stop, 'text': text}
+		return {'start': start, 'stop': stop, 'tag': tag}
 	
 	
-	def add_current(self, stamp, text=''):
+	def add_current(self, stamp, tag=''):
 		"""
 		Creates a new open log entry. Expects a datetime instance with the time
-		of starting the task. The text argument is optional.
+		of starting the task. The tag argument is optional.
 		
 		Note that the contents of the `current` file are overwritten.
 		"""
@@ -96,7 +96,7 @@ class Database:
 		
 		entry = [
 			stamp.strftime(DT_FORMAT).zfill(DT_FORMAT_LEN),
-			self._sanitise_text(text)
+			self._sanitise_text(tag)
 		]
 		
 		with open(path, 'w', newline='') as f:
@@ -108,7 +108,7 @@ class Database:
 	
 	def get_current(self, delete=False):
 		"""
-		Returns {stamp, text} of the currently open log entry or None if there
+		Returns {stamp, tag} of the currently open log entry or None if there
 		is not such. The entry will be removed from the database file if the
 		delete flag is set.
 		"""
@@ -117,7 +117,7 @@ class Database:
 		if not os.path.exists(path):
 			return None
 		
-		entry = {'stamp': None, 'text': None}
+		entry = {'stamp': None, 'tag': None}
 		lines = []
 		
 		with open(path, 'r', newline='') as f:
@@ -137,7 +137,7 @@ class Database:
 			self.log.error(str(err))
 			raise DatabaseError('Could not read the current db file')
 		
-		entry['text'] = lines[0][1] if lines[0][1] else ''
+		entry['tag'] = lines[0][1] if lines[0][1] else ''
 		
 		if delete:
 			with open(path, 'w', newline='') as f:
@@ -146,16 +146,16 @@ class Database:
 		return entry
 	
 	
-	def add_complete(self, start, stop, text=''):
+	def add_complete(self, start, stop, tag=''):
 		"""
 		Creates a new closed log entry. Expects two datetime instances, for
-		when work on the task started and stopped, respectively. The text
+		when work on the task started and stopped, respectively. The tag
 		argument is optional.
 		"""
 		entry = [
-			start.strftime(DT_FORMAT),
-			stop.strftime(DT_FORMAT),
-			self._sanitise_text(text)
+			start.strftime(DT_FORMAT).zfill(DT_FORMAT_LEN),
+			stop.strftime(DT_FORMAT).zfill(DT_FORMAT_LEN),
+			self._sanitise_text(tag)
 		]
 		
 		path = self._get_path(start.year, start.month, create=True)
@@ -179,8 +179,8 @@ class Database:
 	
 	def get_month(self, year, month):
 		"""
-		Returns the [] of {start, stop, text} for the closed log entries for
-		the given month.
+		Returns the [] of {start, stop, tag} for the closed log entries for the
+		given month. The [] is sorted by the start datetime.
 		"""
 		path = self._get_path(year, month)
 		
@@ -200,21 +200,33 @@ class Database:
 				else:
 					li.append(entry)
 		
-		return li
+		return list(sorted(li, key=lambda d: d['start']))
 	
 	
 	def get_day(self, year, month, day):
 		"""
-		Returns the [] of {start, stop, text} for the closed log entries for
-		the given date.
+		Returns the [] of {start, stop, tag} for the closed log entries for the
+		given date. The [] is sorted by the start datetime.
 		"""
-		pass
+		return list(filter(lambda d: d['start'].day == day,
+				self.get_month(year, month)))
 	
 	
 	def get_year(self, year):
 		"""
-		Returns the [] of {start, stop, text} for the closed log entries for
-		the given year.
+		Returns the [] of {start, stop, tag} for the closed log entries for the
+		given year. The [] is sorted by the start datetime.
+		"""
+		return [item
+			for month in range(1, 13)
+			for item in self.get_month(year, month)]
+	
+	
+	def get_tag(self, tag):
+		"""
+		Returns the [] of {start, stop, tag} for the closed log entries that
+		have the given string as their last column. The [] is sorted by the
+		start datetime.
 		"""
 		pass
 
