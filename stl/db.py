@@ -8,14 +8,11 @@ import os
 
 
 """
-The str(f|p)time formats used in the database files and the expected lengths of
+The str(f|p)time format used in the database files and the expected length of
 the formatted strings.
 """
-DT_FORMAT_FULL = '%Y-%m-%d %H:%M'
-DT_FORMAT_FULL_LEN = 16
-
-DT_FORMAT_SHORT = '%d %H:%M'
-DT_FORMAT_SHORT_LEN = 8
+DT_FORMAT = '%Y-%m-%d %H:%M'
+DT_FORMAT_LEN = 16
 
 
 
@@ -71,6 +68,23 @@ class Database:
 		return text.replace('\0', '').strip()
 	
 	
+	def _read_entry(self, line):
+		"""
+		De-serialises a raw closed log file line and returns {start, stop,
+		text}, the first two being naive datetime instances.
+		"""
+		try:
+			assert len(line) == 3
+			start = datetime.strptime(line[0], DT_FORMAT)
+			stop = datetime.strptime(line[1], DT_FORMAT)
+			text = str(line[2])
+		except (AssertionError, ValueError) as err:
+			self.log.error(str(err))
+			raise ValueError
+		
+		return {'start': start, 'stop': stop, 'text': text}
+	
+	
 	def add_current(self, stamp, text=''):
 		"""
 		Creates a new open log entry. Expects a datetime instance with the time
@@ -81,7 +95,7 @@ class Database:
 		path = os.path.join(self.dir_path, 'current')
 		
 		entry = [
-			stamp.strftime(DT_FORMAT_FULL).zfill(DT_FORMAT_FULL_LEN),
+			stamp.strftime(DT_FORMAT).zfill(DT_FORMAT_LEN),
 			self._sanitise_text(text)
 		]
 		
@@ -118,7 +132,7 @@ class Database:
 			raise DatabaseError('Multiple current log entries found')
 		
 		try:
-			entry['stamp'] = datetime.strptime(lines[0][0], DT_FORMAT_FULL)
+			entry['stamp'] = datetime.strptime(lines[0][0], DT_FORMAT)
 		except ValueError as err:
 			self.log.error(str(err))
 			raise DatabaseError('Could not read the current db file')
@@ -139,8 +153,8 @@ class Database:
 		argument is optional.
 		"""
 		entry = [
-			start.strftime(DT_FORMAT_SHORT),
-			stop.strftime(DT_FORMAT_SHORT),
+			start.strftime(DT_FORMAT),
+			stop.strftime(DT_FORMAT),
 			self._sanitise_text(text)
 		]
 		
@@ -163,23 +177,44 @@ class Database:
 		self.log.debug('Added log entry: '+str(entry))
 	
 	
-	def get_day(self, year, month, day):
-		"""
-		Returns the set of closed log entries for the given date.
-		"""
-		pass
-	
-	
 	def get_month(self, year, month):
 		"""
-		Returns the set of closed log entries for the given month.
+		Returns the [] of {start, stop, text} for the closed log entries for
+		the given month.
+		"""
+		path = self._get_path(year, month)
+		
+		if not os.path.exists(path):
+			return []
+		
+		li = []
+		
+		with open(path, newline='') as f:
+			reader = csv.reader(f, delimiter='\t')
+			for line in reader:
+				try:
+					entry = self._read_entry(line)
+				except ValueError:
+					raise DatabaseError(
+						'Could not read the file for '+str(year)+'.'+str(month))
+				else:
+					li.append(entry)
+		
+		return li
+	
+	
+	def get_day(self, year, month, day):
+		"""
+		Returns the [] of {start, stop, text} for the closed log entries for
+		the given date.
 		"""
 		pass
 	
 	
 	def get_year(self, year):
 		"""
-		Returns the set of closed log entries for the given year.
+		Returns the [] of {start, stop, text} for the closed log entries for
+		the given year.
 		"""
 		pass
 
