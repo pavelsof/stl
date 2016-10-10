@@ -9,6 +9,10 @@ from stl.utils import get_natural_str
 
 
 
+"""
+The default logging configuration to be used; it will be slightly altered if
+the verbose flag is set (see Core.__init__).
+"""
 DEFAULT_LOGGING = {
 	'version': 1,
 	'formatters': {
@@ -39,8 +43,10 @@ class Core:
 	
 	def __init__(self, verbose=False):
 		"""
-		Configures the logging. The verbosity flag determines whether the min
-		log level would be DEBUG or INFO.
+		Constructor. Configures the logging and inits the Database instance.
+		
+		The verbosity flag determines whether the min log level would be DEBUG
+		or INFO.
 		"""
 		config = dict(DEFAULT_LOGGING)
 		
@@ -101,6 +107,7 @@ class Core:
 		ValueError if there is not a current task.
 		"""
 		curr = self.db.get_current(delete=True)
+		
 		if curr is None:
 			raise ValueError('You are not working on anything')
 		

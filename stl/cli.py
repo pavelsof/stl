@@ -32,11 +32,13 @@ class Cli:
 		Inits the subparser that handles the start command.
 		"""
 		def start(core, args):
-			core.start(task=args.task)
+			task = args.task if args.task else ''
+			core.start(task=task)
 		
 		subp = self.subparsers.add_parser('start')
 		subp.add_argument('task', nargs='?',
 			help='the task that you are about to start working on')
+		
 		subp.add_argument('-v', '--verbose', action='store_true')
 		
 		subp.set_defaults(func=start)
@@ -52,6 +54,7 @@ class Cli:
 		subp = self.subparsers.add_parser('stop')
 		subp.add_argument('task', nargs='?',
 			help='the task you are about to stop working on')
+		
 		subp.add_argument('-v', '--verbose', action='store_true')
 		
 		subp.set_defaults(func=stop)
@@ -65,20 +68,25 @@ class Cli:
 			return core.status()
 		
 		subp = self.subparsers.add_parser('status')
+		
 		subp.add_argument('-v', '--verbose', action='store_true')
 		
 		subp.set_defaults(func=status)
 	
 	
-	def run(self):
+	def parse_args(self, raw_args=None):
 		"""
-		This is where the show starts.
+		Parses the given arguments (or, except for in unit testing, sys.argv),
+		inits the Core instance and transfers to that. Note that if raw_args is
+		None, then argparse's parser defaults to reading sys.argv.
+		
+		Returns True/False indicating whether the run was successful.
 		"""
-		args = self.parser.parse_args()
+		args = self.parser.parse_args(raw_args)
 		
 		if 'command' not in args:
 			self.parser.print_help()
-			return
+			return True
 		
 		core = Core(verbose=args.verbose)
 		
@@ -86,19 +94,22 @@ class Cli:
 			res = args.func(core, args)
 		except Exception as err:
 			print(str(err))
-		else:
-			if res:
-				print(res)
+			return False
+		
+		if res:
+			print(res)
+		
+		return True
 
 
 
 def main():
 	"""
 	The (only) entry point for the command-line interface as registered in
-	setup.py. Inits a Cli instance and runs it.
+	setup.py. Inits a Cli instance and parses sys.argv.
 	"""
 	cli = Cli()
-	cli.run()
+	cli.parse_args()
 
 
 
