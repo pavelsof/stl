@@ -1,13 +1,14 @@
 from datetime import datetime
 
-import os.path
+import os
 import shutil
 
 from tempfile import TemporaryDirectory
 from unittest import TestCase
 
 from hypothesis.extra.datetime import datetimes
-from hypothesis.strategies import fixed_dictionaries, lists, text
+from hypothesis.strategies import dictionaries, fixed_dictionaries
+from hypothesis.strategies import lists, text
 from hypothesis import given
 
 from stl.db import DatabaseError, Database
@@ -120,6 +121,27 @@ class DatabaseTestCase(TestCase):
 		year_dir = os.path.join(self.temp_dir.name, '2000')
 		if os.path.exists(year_dir):
 			shutil.rmtree(year_dir)
+	
+	
+	@given(dictionaries(
+			keys = text(),
+			values = lists(datetimes(timezones=[]), min_size=1)))
+	def test_add_and_get_task(self, d):
+		d = {task: dts for task, dts in d.items()
+				if self.db._sanitise_text(task)}
+		
+		for task, dts in d.items():
+			for dt in dts:
+				self.db.add_task(task, dt.year, dt.month)
+		
+		for task, dts in d.items():
+			res = self.db.get_task(task)
+			for dt in dts:
+				self.assertIn((dt.year, dt.month), res)
+		
+		path = os.path.join(self.temp_dir.name, 'tasks')
+		if os.path.exists(path):
+			os.remove(path)
 
 
 

@@ -42,24 +42,6 @@ class Database:
 		self.dir_path = dir_path
 	
 	
-	def _get_path(self, year, month, create=False):
-		"""
-		Returns the absolute path to the file containing the logs for the given
-		year and month.
-		"""
-		year_dir = os.path.join(self.dir_path, str(year).zfill(4))
-		
-		if create and not os.path.exists(year_dir):
-			try:
-				os.mkdir(year_dir)
-			except:
-				raise DatabaseError('Could not create database subdir')
-			else:
-				self.log.debug('Created dir '+year_dir)
-		
-		return os.path.join(year_dir, str(month).zfill(2))
-	
-	
 	def _sanitise_text(self, text):
 		"""
 		Prepares the given text for writing to a database file. Also, the NUL
@@ -68,23 +50,9 @@ class Database:
 		return text.replace('\0', '').strip()
 	
 	
-	def _read_entry(self, line):
-		"""
-		De-serialises a raw closed log file line and returns {start, stop,
-		task}, the first two being naive datetime instances.
-		"""
-		try:
-			assert len(line) == 3
-			start = datetime.strptime(line[0], DT_FORMAT)
-			stop = datetime.strptime(line[1], DT_FORMAT)
-			task = str(line[2])
-		except (AssertionError, ValueError) as err:
-			self.log.error(str(err))
-			raise ValueError
-		
-		return {'start': start, 'stop': stop, 'task': task}
-	
-	
+	"""
+	Methods handling the current file
+	"""
 	def add_current(self, stamp, task=''):
 		"""
 		Creates a new open log entry. Expects a datetime instance with the time
@@ -144,6 +112,44 @@ class Database:
 				pass
 		
 		return entry
+	
+	
+	"""
+	Methods handling the archive files
+	"""
+	def _get_path(self, year, month, create=False):
+		"""
+		Returns the absolute path to the file containing the logs for the given
+		year and month.
+		"""
+		year_dir = os.path.join(self.dir_path, str(year).zfill(4))
+		
+		if create and not os.path.exists(year_dir):
+			try:
+				os.mkdir(year_dir)
+			except:
+				raise DatabaseError('Could not create database subdir')
+			else:
+				self.log.debug('Created dir '+year_dir)
+		
+		return os.path.join(year_dir, str(month).zfill(2))
+	
+	
+	def _read_entry(self, line):
+		"""
+		De-serialises a raw closed log file line and returns {start, stop,
+		task}, the first two being naive datetime instances.
+		"""
+		try:
+			assert len(line) == 3
+			start = datetime.strptime(line[0], DT_FORMAT)
+			stop = datetime.strptime(line[1], DT_FORMAT)
+			task = str(line[2])
+		except (AssertionError, ValueError) as err:
+			self.log.error(str(err))
+			raise ValueError
+		
+		return {'start': start, 'stop': stop, 'task': task}
 	
 	
 	def add_complete(self, start, stop, task=''):
@@ -222,13 +228,96 @@ class Database:
 			for item in self.get_month(year, month)]
 	
 	
+	"""
+	Methods handling the tasks file
+	"""
+	def _read_tasks_file(self, path):
+		"""
+		Returns a [] of the csv-read lines of the given tasks file. Helper used
+		by both add_task and get_task.
+		"""
+		lines = []
+		
+		if os.path.exists(path):
+			with open(path, newline='') as f:
+				reader = csv.reader(f, delimiter='\t')
+				for line in reader:
+					lines.append(line)
+		
+		return lines
+	
+	
+	def add_task(self, task, year, month):
+		"""
+		Adds an entry in the tasks file for the given task for the given year
+		and month. The file is unchanged if the (task, year, month) tuple is
+		already recorded.
+		"""
+		task = self._sanitise_text(task)
+		if not len(task):
+			raise ValueError('Task cannot be an empty string')
+		
+		s = '{}-{:02}'.format(year, month)
+		
+		path = os.path.join(self.dir_path, 'tasks')
+		lines = self._read_tasks_file(path)
+		entry = [line[1] for line in lines if line[0] == task]
+		
+		if len(entry) == 0:
+			lines.append([task, s])
+			lines = sorted(lines, key=lambda x: x[0])
+		elif len(entry) == 1:
+			li = entry[0].split(',')
+			if s in li:
+				return
+			
+			li.append(s)
+			lines = [
+				[line[0], ','.join(li) if line[0] == task else line[1]]
+				for line in lines
+			]
+		else:
+			raise DatabaseError('Multiple entries for task {}'.format(task))
+		
+		with open(path, 'w', newline='') as f:
+			writer = csv.writer(f, delimiter='\t')
+			for line in lines:
+				writer.writerow(line)
+		
+		self.log.debug('Added time entry for task {}: {}'.format(task, entry))
+	
+	
 	def get_task(self, task):
 		"""
-		Returns the [] of {start, stop, task} for the closed log entries that
-		have the given string as their last column. The [] is sorted by the
-		start datetime.
+		Returns the [] of (year, month) tuples for which the given task has
+		closed log entries.
 		"""
-		pass
+		task = self._sanitise_text(task)
+		if not len(task):
+			raise ValueError('Task cannot be an empty string')
+		
+		path = os.path.join(self.dir_path, 'tasks')
+		lines = self._read_tasks_file(path)
+		entry = [line[1] for line in lines if line[0] == task]
+		
+		if len(entry) == 0:
+			return []
+		elif len(entry) > 1:
+			raise DatabaseError('Multiple entries for task {}'.format(task))
+		
+		li = []
+		entry = entry[0].split(',')
+		
+		for item in entry:
+			try:
+				item = item.split('-')
+				item = tuple([int(item[0]), int(item[1])])
+			except (KeyError, ValueError) as err:
+				self.log.error(str(err))
+				raise DatabaseError('Could not read tasks file')
+			li.append(item)
+		
+		return li
 
 
 
