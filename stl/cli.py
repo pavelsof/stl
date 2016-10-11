@@ -60,18 +60,25 @@ class Cli:
 	
 	def _init_status(self):
 		"""
-		Inits the subparser that handles the status command.
+		Inits the subparser that handles the status/show command.
 		"""
 		def status(core, args):
-			return core.status()
+			extra = None
+			
+			for key in ('day', 'week', 'month', 'task'):
+				if getattr(args, key) is not None:
+					extra = (key, getattr(args, key))
+					break
+			
+			return core.status(extra=extra)
 		
 		subp = self.subparsers.add_parser('status', aliases=['show'])
 		
-		'''subp.add_argument('-d', '--day')
-		subp.add_argument('-w', '--week')
-		subp.add_argument('-m', '--month')
-		
-		subp.add_argument('-t', '--task')'''
+		group = subp.add_mutually_exclusive_group()
+		group.add_argument('-d', '--day')
+		group.add_argument('-w', '--week')
+		group.add_argument('-m', '--month')
+		group.add_argument('-t', '--task')
 		
 		subp.add_argument('-v', '--verbose', action='store_true')
 		subp.set_defaults(func=status)

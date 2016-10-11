@@ -120,12 +120,28 @@ class Core:
 			pass
 	
 	
-	def status(self):
+	def status(self, extra=None):
 		"""
-		Returns a string saying whether there is a current task and what it is.
+		Returns a human-readable string with status information. The optional
+		argument can be a (key, value) tuple, with the key being one of ('day',
+		'week', 'month', 'task').
 		"""
 		status = Status(self.db)
-		return status.get_current_info(datetime.now())
+		
+		if extra:
+			key, value = extra
+			if key == 'day':
+				now = datetime.now()
+				res = status.get_day_info(now.year, now.month, now.day)
+			elif key == 'month':
+				now = datetime.now()
+				res = status.get_month_info(now.year, now.month)
+			else:
+				res = status.get_task_info(value)
+		else:
+			res = status.get_current_info(datetime.now())
+		
+		return res
 	
 	
 	def scan(self):

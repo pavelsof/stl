@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
+from functools import reduce
 
 import logging
 
@@ -45,12 +46,43 @@ class Status:
 		return '\n'.join(li)
 	
 	
-	def get_month_info(self, year, month):
+	def _get_time_info(self, logs):
+		"""
+		Helper used by the following three methods. Returns a human-readable
+		string containing info about the time spent working based on the given
+		log entries.
+		"""
+		hours = timedelta(0)
+		tasks = {}  # task: timedelta
+		
+		for entry in logs:
+			delta = entry['stop'] - entry['start']
+			hours += delta
+			if len(entry['task']):
+				if entry['task'] in tasks:
+					tasks[entry['task']] += delta
+				else:
+					tasks[entry['task']] = delta
+		
+		tasks = [(task, delta) for task, delta in tasks.items()]
+		tasks = sorted(tasks, key=lambda x: x[1])
+		tasks = ', '.join([
+			'{} ({})'.format(task, get_natural_str(delta))
+			for task, delta in tasks
+		])
+		
+		return '\n'.join([
+			'tasks: {}'.format(tasks),
+			'total: {}'.format(get_natural_str(hours))
+		])
+	
+	
+	def get_day_info(self, year, month, day):
 		"""
 		Returns a human-readable string containing info about the work done
-		during the given month.
+		during the given day.
 		"""
-		pass
+		return self._get_time_info(self.db.get_day(year, month, day))
 	
 	
 	def get_week_info(self, year, week):
@@ -61,12 +93,12 @@ class Status:
 		pass
 	
 	
-	def get_day_info(self, year, month, day):
+	def get_month_info(self, year, month):
 		"""
 		Returns a human-readable string containing info about the work done
-		during the given day.
+		during the given month.
 		"""
-		pass
+		return self._get_time_info(self.db.get_month(year, month))
 	
 	
 	def get_task_info(self, task):
@@ -74,7 +106,27 @@ class Status:
 		Returns a human-readable string containing info about the hours worked
 		on the given task.
 		"""
-		pass
+		logs = []
+		for year, month in self.db.get_task(task):
+			logs.extend(list(filter(
+				lambda entry: entry['task'] == task,
+				self.db.get_month(year, month))))
+		
+		if not len(logs):
+			return 'task {} not found'.format(task)
+		
+		logs = list(sorted(logs, key=lambda item: item['start']))
+		
+		started = logs[0]['start']
+		last_mod = logs[-1]['stop']
+		hours = reduce(lambda x,y: x+y,
+					[log['stop']-log['start'] for log in logs])
+		
+		return '\n'.join([
+			'started: {}'.format(started),
+			'last mod: {}'.format(last_mod),
+			'total: {}'.format(get_natural_str(hours))
+		])
 
 
 
