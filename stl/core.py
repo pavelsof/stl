@@ -5,6 +5,7 @@ import logging
 import os
 
 from stl.db import DatabaseError, Database
+from stl.status import Status
 from stl.utils import get_natural_str
 
 
@@ -112,26 +113,19 @@ class Core:
 			raise ValueError('You are not working on anything')
 		
 		self.db.add_complete(curr['stamp'], datetime.now(), curr['task'])
+		
+		try:
+			self.db.add_task(curr['task'], curr['stamp'].year, curr['stamp'].month)
+		except ValueError:
+			pass
 	
 	
 	def status(self):
 		"""
 		Returns a string saying whether there is a current task and what it is.
 		"""
-		curr = self.db.get_current()
-		s = ''
-		
-		if curr is None:
-			s = 'Nothing to see here'
-		else:
-			delta = datetime.now() - curr['stamp']
-			
-			if curr['task']:
-				s += 'Task: '+curr['task']+'\n'
-			s += 'Started: '+str(curr['stamp'])+'\n'
-			s += 'Elapsed: '+get_natural_str(delta)
-		
-		return s
+		status = Status(self.db)
+		return status.get_current_info(datetime.now())
 	
 	
 	def scan(self):

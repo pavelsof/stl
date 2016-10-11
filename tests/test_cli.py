@@ -16,7 +16,7 @@ class CliTestCase(TestCase):
 	
 	
 	@given(fixed_dictionaries({
-			'task': text(),
+			'task': text().filter(lambda t: not t.startswith('-')),
 			'verbose': sampled_from(['-v', '--verbose', ''])}))
 	def test_start_does_not_break(self, d):
 		args = [value for value in d.values() if value]

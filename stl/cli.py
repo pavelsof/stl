@@ -40,7 +40,6 @@ class Cli:
 			help='the task that you are about to start working on')
 		
 		subp.add_argument('-v', '--verbose', action='store_true')
-		
 		subp.set_defaults(func=start)
 	
 	
@@ -56,7 +55,6 @@ class Cli:
 			help='the task you are about to stop working on')
 		
 		subp.add_argument('-v', '--verbose', action='store_true')
-		
 		subp.set_defaults(func=stop)
 	
 	
@@ -67,10 +65,15 @@ class Cli:
 		def status(core, args):
 			return core.status()
 		
-		subp = self.subparsers.add_parser('status')
+		subp = self.subparsers.add_parser('status', aliases=['show'])
+		
+		'''subp.add_argument('-d', '--day')
+		subp.add_argument('-w', '--week')
+		subp.add_argument('-m', '--month')
+		
+		subp.add_argument('-t', '--task')'''
 		
 		subp.add_argument('-v', '--verbose', action='store_true')
-		
 		subp.set_defaults(func=status)
 	
 	

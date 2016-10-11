@@ -110,6 +110,7 @@ class Database:
 		if delete:
 			with open(path, 'w', newline='') as f:
 				pass
+			self.log.debug('Deleted contents of the current db file')
 		
 		return entry
 	
