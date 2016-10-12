@@ -65,9 +65,9 @@ class Cli:
 		def status(core, args):
 			extra = None
 			
-			for key in ('day', 'week', 'month', 'task'):
+			for key in ['day', 'month', 'task']:
 				if getattr(args, key) is not None:
-					extra = (key, getattr(args, key))
+					extra = (key, ' '.join(getattr(args, key)))
 					break
 			
 			return core.status(extra=extra)
@@ -75,51 +75,46 @@ class Cli:
 		subp = self.subparsers.add_parser('status', aliases=['show'])
 		
 		group = subp.add_mutually_exclusive_group()
-		group.add_argument('-d', '--day')
-		group.add_argument('-w', '--week')
-		group.add_argument('-m', '--month')
-		group.add_argument('-t', '--task')
+		group.add_argument('-d', '--day', nargs='*')
+		group.add_argument('-m', '--month', nargs='*')
+		group.add_argument('-t', '--task', nargs=1)
 		
 		subp.add_argument('-v', '--verbose', action='store_true')
 		subp.set_defaults(func=status)
 	
 	
-	def parse_args(self, raw_args=None):
+	def run(self, raw_args=None):
 		"""
 		Parses the given arguments (or, except for in unit testing, sys.argv),
 		inits the Core instance and transfers to that. Note that if raw_args is
 		None, then argparse's parser defaults to reading sys.argv.
 		
-		Returns True/False indicating whether the run was successful.
+		Returns a human-readable string to be printed to the user.
 		"""
 		args = self.parser.parse_args(raw_args)
 		
 		if 'command' not in args:
-			self.parser.print_help()
-			return True
+			return self.parser.format_help()
 		
 		core = Core(verbose=args.verbose)
 		
 		try:
 			res = args.func(core, args)
 		except Exception as err:
-			print(str(err))
-			return False
+			return str(err)
 		
-		if res:
-			print(res)
-		
-		return True
+		return res
 
 
 
 def main():
 	"""
 	The (only) entry point for the command-line interface as registered in
-	setup.py. Inits a Cli instance and parses sys.argv.
+	setup.py. Inits a Cli instance, runs it with sys.argv, and prints the
+	output to stdout.
 	"""
 	cli = Cli()
-	cli.parse_args()
+	print(cli.run())
 
 
 
