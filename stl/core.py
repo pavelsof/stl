@@ -6,7 +6,7 @@ import os
 
 from stl.db import DatabaseError, Database
 from stl.status import Status
-from stl.utils import get_natural_str
+from stl.time import prettify_delta
 
 
 

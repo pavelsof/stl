@@ -3,7 +3,7 @@ from functools import reduce
 
 import logging
 
-from stl.utils import get_natural_str
+from stl.time import prettify_delta
 
 
 
@@ -41,7 +41,7 @@ class Status:
 		delta = now - curr['stamp']
 		
 		li.append('started: {}'.format(curr['stamp']))
-		li.append('elapsed: {}'.format(get_natural_str(delta)))
+		li.append('elapsed: {}'.format(prettify_delta(delta)))
 		
 		return '\n'.join(li)
 	
@@ -67,13 +67,13 @@ class Status:
 		tasks = [(task, delta) for task, delta in tasks.items()]
 		tasks = sorted(tasks, key=lambda x: x[1])
 		tasks = ', '.join([
-			'{} ({})'.format(task, get_natural_str(delta))
+			'{} ({})'.format(task, prettify_delta(delta))
 			for task, delta in tasks
 		])
 		
 		return '\n'.join([
 			'tasks: {}'.format(tasks),
-			'total: {}'.format(get_natural_str(hours))
+			'total: {}'.format(prettify_delta(hours))
 		])
 	
 	
@@ -125,7 +125,7 @@ class Status:
 		return '\n'.join([
 			'started: {}'.format(started),
 			'last mod: {}'.format(last_mod),
-			'total: {}'.format(get_natural_str(hours))
+			'total: {}'.format(prettify_delta(hours))
 		])
 
 
