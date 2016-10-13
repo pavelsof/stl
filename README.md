@@ -14,14 +14,14 @@ stl start lumberjacking
 until the moment you do:
 
 ```bash
-stl stop lumberjacking
+stl stop
 ```
 
 will be added to the time logs. Once your logs start piling up, you can fulfil
 your working hours curiousity:
 
 ```bash
-stl show --project lumberjacking
+stl show --task lumberjacking
 stl show --month october
 ```
 
@@ -31,6 +31,9 @@ console diagrams.
 
 ## installation
 
+This is a standard Python 3 package installable through pip and without
+dependencies. The data is stored in human-readable files in either
+`~/.config/stl` or `~/.stl` (if there is not a `~/.config` dir already).
 
 
 ## licence

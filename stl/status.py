@@ -3,7 +3,7 @@ from functools import reduce
 
 import logging
 
-from stl.time import prettify_delta
+from stl.time import prettify_date, prettify_delta
 
 
 
@@ -71,6 +71,8 @@ class Status:
 			for task, delta in tasks
 		])
 		
+		if not tasks: tasks = '-'
+		
 		return '\n'.join([
 			'tasks: {}'.format(tasks),
 			'total: {}'.format(prettify_delta(hours))
@@ -82,7 +84,11 @@ class Status:
 		Returns a human-readable string containing info about the work done
 		during the given day.
 		"""
-		return self._get_time_info(self.db.get_day(year, month, day))
+		logs = self.db.get_day(year, month, day)
+		return '\n'.join([
+			'[{}]'.format(prettify_date(year, month, day)),
+			self._get_time_info(logs)
+		])
 	
 	
 	def get_week_info(self, year, week):
@@ -98,7 +104,11 @@ class Status:
 		Returns a human-readable string containing info about the work done
 		during the given month.
 		"""
-		return self._get_time_info(self.db.get_month(year, month))
+		logs = self.db.get_month(year, month)
+		return '\n'.join([
+			'[{}]'.format(prettify_date(year, month)),
+			self._get_time_info(logs)
+		])
 	
 	
 	def get_task_info(self, task):
@@ -123,6 +133,7 @@ class Status:
 					[log['stop']-log['start'] for log in logs])
 		
 		return '\n'.join([
+			'[{}]'.format(task),
 			'started: {}'.format(started),
 			'last mod: {}'.format(last_mod),
 			'total: {}'.format(prettify_delta(hours))

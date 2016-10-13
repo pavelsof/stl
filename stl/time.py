@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime
 from itertools import permutations
 
 import logging
@@ -142,10 +142,30 @@ class Parser:
 
 
 
+"""
+Functions that convert time units into pretty strings for human consumption
+"""
+
+def prettify_date(year, month, day=None):
+	"""
+	Returns a human-readable string representing the date defined by the given
+	parameters.
+	"""
+	if day:
+		d = date(year, month, day)
+		s = d.strftime('%d %b %Y')
+	else:
+		d = date(year, month, 1)
+		s = d.strftime('%b %Y')
+	
+	return s.lower()
+
+
+
 def prettify_delta(delta):
 	"""
-	Returns a natural string representing the given timedelta. The biggest unit
-	is the hour, because a working day is too ambiguous.
+	Returns a human-readable string representing the given timedelta. The
+	biggest unit is the hour, because a working day is too ambiguous.
 	"""
 	d = {}
 	
@@ -161,7 +181,10 @@ def prettify_delta(delta):
 				s = s[:-1]
 			li.append(s)
 	
-	return ', '.join(li)
+	s = ', '.join(li)
+	if not s: s = '-'
+	
+	return s
 
 
 
