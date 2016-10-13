@@ -1,6 +1,7 @@
 meta/*
 stl.egg-info/*
 
+.coverage
 .hypothesis/*
 
 *.pyc

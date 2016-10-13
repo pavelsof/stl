@@ -6,7 +6,7 @@ from hypothesis.extra.datetime import dates
 from hypothesis.strategies import just, sampled_from
 from hypothesis import given
 
-from stl.time import Parser, prettify_delta
+from stl.time import Parser, prettify_date, prettify_delta
 
 
 
@@ -57,10 +57,40 @@ class ParserTestCase(TestCase):
 		self.assertEqual(year, self.now.year)
 		self.assertEqual(month, self.now.month)
 		self.assertEqual(day, d.day)
+	
+	
+	def test_extract_empty_strings(self):
+		year, month = self.parser.extract_month('')
+		self.assertEqual(year, self.now.year)
+		self.assertEqual(month, self.now.month)
+		
+		year, month, day = self.parser.extract_date('')
+		self.assertEqual(year, self.now.year)
+		self.assertEqual(month, self.now.month)
+		self.assertEqual(day, self.now.day)
 
 
 
 class PrettifyTestCase(TestCase):
+	
+	def setUp(self):
+		self.now = datetime(2016, 10, 15)
+		self.parser = Parser(self.now)
+	
+	
+	@given(dates(min_year=1000))
+	def test_prettify_date(self, d):
+		s = prettify_date(d.year, d.month, d.day)
+		year, month, day = self.parser.extract_date(s)
+		self.assertEqual(year, d.year)
+		self.assertEqual(month, d.month)
+		self.assertEqual(day, d.day)
+		
+		s = prettify_date(d.year, d.month)
+		year, month = self.parser.extract_month(s)
+		self.assertEqual(year, d.year)
+		self.assertEqual(month, d.month)
+	
 	
 	def test_prettify_delta(self):
 		self.assertEqual(prettify_delta(timedelta(hours=1)), '1 hour')

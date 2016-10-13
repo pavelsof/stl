@@ -42,7 +42,9 @@ class CliTestCase(TestCase):
 			'extra': one_of(
 				tuples(just('day'), sampled_from(['-d', '--day']), text(min_size=1)),
 				tuples(just('month'), sampled_from(['-m', '--month']), text(min_size=1)),
-				tuples(just('task'), sampled_from(['-t', '--task']), text(min_size=1)),
+				tuples(just('task'),
+					sampled_from(['-t', '--task']),
+					text(min_size=1).filter(lambda t: not t.startswith('-'))),
 				just(None)),
 			'verbose': sampled_from(['-v', '--verbose', ''])}))
 	def test_status_does_not_break(self, d):

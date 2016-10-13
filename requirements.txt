@@ -1,0 +1,3 @@
+coverage==4.2
+hypothesis==3.5.3
+pytz==2016.7
