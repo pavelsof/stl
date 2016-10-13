@@ -31,7 +31,7 @@ class Status:
 		"""
 		curr = self.db.get_current()
 		if curr is None:
-			return ''
+			return 'nothing to see here'
 		
 		li = []
 		

@@ -6,7 +6,7 @@ import os
 
 from stl.db import DatabaseError, Database
 from stl.status import Status
-from stl.time import prettify_delta
+from stl.time import Parser, prettify_delta
 
 
 
@@ -127,21 +127,23 @@ class Core:
 		'week', 'month', 'task').
 		"""
 		status = Status(self.db)
+		now = datetime.now()
 		
-		if extra:
-			key, value = extra
-			if key == 'day':
-				now = datetime.now()
-				res = status.get_day_info(now.year, now.month, now.day)
-			elif key == 'month':
-				now = datetime.now()
-				res = status.get_month_info(now.year, now.month)
-			else:
-				res = status.get_task_info(value)
-		else:
-			res = status.get_current_info(datetime.now())
+		if not extra:
+			return status.get_current_info(now)
 		
-		return res
+		key, value = extra
+		
+		if key == 'task':
+			return status.get_task_info(value)
+		
+		parser = Parser(now)
+		if key == 'day':
+			year, month, day = parser.extract_date(value)
+			return status.get_day_info(year, month, day)
+		elif key == 'month':
+			year, month = parser.extract_month(value)
+			return status.get_month_info(year, month)
 	
 	
 	def scan(self):

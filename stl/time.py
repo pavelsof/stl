@@ -76,6 +76,19 @@ class Parser:
 			raise ValueError('Could not extract month: {}'.format(s))
 	
 	
+	def _get_day(self, s):
+		"""
+		Returns the day represented by the given string by trying the day
+		strptime directive. Raises ValueError if unsuccessful.
+		"""
+		try:
+			dt = datetime.strptime(s, '%d')
+		except ValueError:
+			raise ValueError('Could not extract day: {}'.format(s))
+		else:
+			return dt.day
+	
+	
 	def extract_month(self, s):
 		"""
 		Returns a (year, month) tuple extracted form the given string. Raises
@@ -87,13 +100,45 @@ class Parser:
 			return self.now.year, self.now.month
 		elif len(li) == 1:
 			return self.now.year, self._get_month(s)
+		elif len(li) == 2:
+			combos = self._try([self._get_year, self._get_month], li)
+			if len(combos) != 1:
+				raise ValueError('Could not infer month: {}'.format(s))
+			
+			return combos[0][0], combos[0][1]
 		
-		combos = self._try([self._get_year, self._get_month], li)
-		
-		if len(combos) != 1:
+		else:
 			raise ValueError('Could not infer month: {}'.format(s))
+	
+	
+	def extract_date(self, s):
+		"""
+		Returns a (year, month, day) tuple extracted from the given string.
+		Raises ValueError if unsuccessful.
+		"""
+		li = s.split()
 		
-		return combos[0][0], combos[0][1]
+		if len(li) == 0:
+			return self.now.year, self.now.month, self.now.day
+		elif len(li) == 1:
+			return self.now.year, self.now.month, self._get_day(li[0])
+		
+		elif len(li) == 2:
+			combos = self._try([self._get_month, self._get_day], li)
+			if len(combos) != 1:
+				raise ValueError('Could not infer date: {}'.format(s))
+			
+			return self.now.year, combos[0][0], combos[0][1]
+		
+		elif len(li) == 3:
+			combos = self._try([self._get_year, self._get_month, self._get_day], li)
+			if len(combos) != 1:
+				raise ValueError('Could not infer date: {}'.format(s))
+			
+			return combos[0][0], combos[0][1], combos[0][2]
+		
+		else:
+			raise ValueError('Could not infer date: {}'.format(s))
 
 
 
