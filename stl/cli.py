@@ -24,6 +24,8 @@ class Cli:
 		
 		self._init_start()
 		self._init_stop()
+		self._init_switch()
+		
 		self._init_status()
 	
 	
@@ -56,6 +58,22 @@ class Cli:
 		
 		subp.add_argument('-v', '--verbose', action='store_true')
 		subp.set_defaults(func=stop)
+	
+	
+	def _init_switch(self):
+		"""
+		Inits the subparser that handles the switch command.
+		"""
+		def switch(core, args):
+			task = args.task if args.task else ''
+			return core.switch(task=task)
+		
+		subp = self.subparsers.add_parser('switch')
+		subp.add_argument('task', nargs='?',
+			help='the task that you are about to start working on')
+		
+		subp.add_argument('-v', '--verbose', action='store_true')
+		subp.set_defaults(func=switch)
 	
 	
 	def _init_status(self):

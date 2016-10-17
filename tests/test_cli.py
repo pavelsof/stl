@@ -38,6 +38,17 @@ class CliTestCase(TestCase):
 	
 	
 	@given(fixed_dictionaries({
+			'task': text().filter(lambda t: not t.startswith('-')),
+			'verbose': sampled_from(['-v', '--verbose', ''])}))
+	def test_switch_does_not_break(self, d):
+		args = [value for value in d.values() if value]
+		
+		with patch.object(Core, 'switch') as mock_start:
+			self.cli.run(['switch'] + args)
+			mock_start.assert_called_once_with(task=d['task'])
+	
+	
+	@given(fixed_dictionaries({
 			'command': sampled_from(['status', 'show']),
 			'extra': one_of(
 				tuples(just('day'), sampled_from(['-d', '--day']), text(min_size=1)),

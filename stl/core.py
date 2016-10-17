@@ -131,7 +131,21 @@ class Core:
 		except ValueError:
 			pass
 		
-		return 'stopped'
+		s = 'stopped'
+		if curr['task']:
+			s += ' with '+curr['task']
+		
+		return s
+	
+	
+	def switch(self, task='', now=None):
+		"""
+		Shortcut that stops the current task and immediately starts a new one.
+		"""
+		res_stop = self.stop(now=now)
+		res_start = self.start(task, now=now)
+		
+		return '\n'.join([res_stop, res_start])
 	
 	
 	def status(self, extra=None, now=None):
