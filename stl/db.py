@@ -11,8 +11,8 @@ import os
 The str(f|p)time format used in the database files and the expected length of
 the formatted strings.
 """
-DT_FORMAT = '%Y-%m-%d %H:%M'
-DT_FORMAT_LEN = 16
+DT_FORMAT = '%Y-%m-%d %H:%M:%S'
+DT_FORMAT_LEN = 19
 
 
 

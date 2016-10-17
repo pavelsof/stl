@@ -33,7 +33,7 @@ class Cli:
 		"""
 		def start(core, args):
 			task = args.task if args.task else ''
-			core.start(task=task)
+			return core.start(task=task)
 		
 		subp = self.subparsers.add_parser('start')
 		subp.add_argument('task', nargs='?',
@@ -48,7 +48,7 @@ class Cli:
 		Inits the subparser that handles the stop command.
 		"""
 		def stop(core, args):
-			core.stop()
+			return core.stop()
 		
 		subp = self.subparsers.add_parser('stop')
 		subp.add_argument('task', nargs='?',

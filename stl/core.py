@@ -89,45 +89,61 @@ class Core:
 		return dir_path
 	
 	
-	def start(self, task=''):
+	def start(self, task='', now=None):
 		"""
 		Adds a record that work is starting on the given task. The latter can
 		also be an empty string. Raises ValueError if there is already a
 		current task.
 		"""
+		if now is None:
+			now = datetime.now()
+		
 		curr = self.db.get_current()
 		if curr is not None:
 			raise ValueError('You are already working on something')
 		
-		self.db.add_current(datetime.now(), task)
+		self.db.add_current(now, task)
+		
+		s = 'started'
+		if task:
+			s += ' on '+task
+		
+		return s
 	
 	
-	def stop(self):
+	def stop(self, now=None):
 		"""
 		Adds a record that work has stopped on the current task. Raises
 		ValueError if there is not a current task.
 		"""
+		if now is None:
+			now = datetime.now()
+		
 		curr = self.db.get_current(delete=True)
 		
 		if curr is None:
 			raise ValueError('You are not working on anything')
 		
-		self.db.add_complete(curr['stamp'], datetime.now(), curr['task'])
+		self.db.add_complete(curr['stamp'], now, curr['task'])
 		
 		try:
 			self.db.add_task(curr['task'], curr['stamp'].year, curr['stamp'].month)
 		except ValueError:
 			pass
+		
+		return 'stopped'
 	
 	
-	def status(self, extra=None):
+	def status(self, extra=None, now=None):
 		"""
 		Returns a human-readable string with status information. The optional
 		argument can be a (key, value) tuple, with the key being one of ('day',
 		'week', 'month', 'task').
 		"""
+		if now is None:
+			now = datetime.now()
+		
 		status = Status(self.db)
-		now = datetime.now()
 		
 		if not extra:
 			return status.get_current_info(now)
