@@ -5,7 +5,6 @@ import logging
 import os
 
 from stl.db import DatabaseError, Database
-from stl.scan import Scanner
 from stl.status import Status
 from stl.time import Parser, prettify_delta
 
@@ -175,14 +174,6 @@ class Core:
 		elif key == 'month':
 			year, month = parser.extract_month(value)
 			return status.get_month_info(year, month)
-	
-	
-	def scan(self, file_path, re_pattern):
-		"""
-		It will not save anything to the database before going over the whole
-		file.
-		"""
-		pass
 
 
 

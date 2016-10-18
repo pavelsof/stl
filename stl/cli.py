@@ -28,7 +28,8 @@ class Cli:
 		
 		self._init_status()
 		
-		self._init_scan()
+		self._init_add()
+		self._init_edit()
 	
 	
 	def _init_start(self):
@@ -103,25 +104,39 @@ class Cli:
 		subp.set_defaults(func=status)
 	
 	
-	def _init_scan(self):
+	def _init_add(self):
 		"""
-		Inits the subparser that handles the scan command.
+		Inits the subparser that handles the add command.
 		"""
-		def scan(core, args):
-			return core.scan()
+		def add(core, args):
+			return core.add(args.start, args.stop, args.task)
 		
-		subp = self.subparsers.add_parser('scan')
+		subp = self.subparsers.add_parser('add',
+			description='adds a time log')
 		
-		subp.add_argument('file', help='the file to be scanned')
-		subp.add_argument('regex',
-			help='the regex pattern to apply on each line of the file')
-		
-		subp.add_argument('--year', help='provide a default year')
-		subp.add_argument('--month', help='provide a default month')
-		subp.add_argument('--day', help='provide a default day')
+		subp.add_argument('start',
+			help='when work on the task started; use %%Y-%%m-%%d %%H:%%M')
+		subp.add_argument('stop',
+			help='when work on the task stopped; use %%Y-%%m-%%d %%H:%%M')
+		subp.add_argument('task', nargs='?', default='',
+			help='the task being worked on; optional')
 		
 		subp.add_argument('-v', '--verbose', action='store_true')
-		subp.set_defaults(func=scan)
+		subp.set_defaults(func=add)
+	
+	
+	def _init_edit(self):
+		"""
+		Inits the subparser that handles the edit command.
+		"""
+		def edit(core, args):
+			return core.edit()
+		
+		subp = self.subparsers.add_parser('edit',
+			description='lets you vim the right file')
+		
+		subp.add_argument('-v', '--verbose', action='store_true')
+		subp.set_defaults(func=edit)
 	
 	
 	def run(self, raw_args=None):
