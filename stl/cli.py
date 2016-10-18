@@ -27,6 +27,8 @@ class Cli:
 		self._init_switch()
 		
 		self._init_status()
+		
+		self._init_scan()
 	
 	
 	def _init_start(self):
@@ -99,6 +101,27 @@ class Cli:
 		
 		subp.add_argument('-v', '--verbose', action='store_true')
 		subp.set_defaults(func=status)
+	
+	
+	def _init_scan(self):
+		"""
+		Inits the subparser that handles the scan command.
+		"""
+		def scan(core, args):
+			return core.scan()
+		
+		subp = self.subparsers.add_parser('scan')
+		
+		subp.add_argument('file', help='the file to be scanned')
+		subp.add_argument('regex',
+			help='the regex pattern to apply on each line of the file')
+		
+		subp.add_argument('--year', help='provide a default year')
+		subp.add_argument('--month', help='provide a default month')
+		subp.add_argument('--day', help='provide a default day')
+		
+		subp.add_argument('-v', '--verbose', action='store_true')
+		subp.set_defaults(func=scan)
 	
 	
 	def run(self, raw_args=None):
