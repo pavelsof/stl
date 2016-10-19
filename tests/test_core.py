@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import os.path
 import shutil
 
@@ -33,7 +35,7 @@ class CoreTestCase(TestCase):
 		self.assertEqual(dt1.day, dt2.day)
 		self.assertEqual(dt1.hour, dt2.hour)
 		self.assertEqual(dt1.minute, dt2.minute)
-		self.assertEqual(dt1.second, dt2.second)
+		# self.assertEqual(dt1.second, dt2.second)
 	
 	
 	@given(datetimes(timezones=[]), text())
@@ -67,6 +69,25 @@ class CoreTestCase(TestCase):
 		
 		with self.assertRaises(ValueError):
 			self.core.stop(now=dt2)
+		
+		year_dir = os.path.join(self.temp_dir.name, str(dt1.year))
+		shutil.rmtree(year_dir)
+	
+	
+	@given(datetimes(min_year=1000, timezones=[]),
+			datetimes(min_year=1000, timezones=[]),
+			text())
+	def test_add(self, dt1, dt2, t):
+		assume(dt1 < dt2 and dt2 - dt1 > timedelta(minutes=1))
+		self.core.add(dt1.isoformat(), dt2.isoformat(), t)
+		
+		res = self.core.db.get_day(dt1.year, dt1.month, dt1.day)[0]
+		self._check_dt_equal(res['start'], dt1)
+		self._check_dt_equal(res['stop'], dt2)
+		self.assertEqual(res['task'], self.core.db._sanitise_text(t))
+		
+		with self.assertRaises(ValueError):
+			self.core.add(dt2.isoformat(), dt1.isoformat(), t)
 		
 		year_dir = os.path.join(self.temp_dir.name, str(dt1.year))
 		shutil.rmtree(year_dir)

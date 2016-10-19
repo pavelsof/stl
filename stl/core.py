@@ -6,7 +6,7 @@ import os
 
 from stl.db import DatabaseError, Database
 from stl.status import Status
-from stl.time import Parser, prettify_delta
+from stl.time import Parser, prettify_datetime, prettify_delta
 
 
 
@@ -174,6 +174,35 @@ class Core:
 		elif key == 'month':
 			year, month = parser.extract_month(value)
 			return status.get_month_info(year, month)
+	
+	
+	def add(self, start, stop, task=''):
+		"""
+		Adds a time log to the database. Expects two ISO format strings that
+		specifiy the time interval, and, optionally, the name of the task.
+		
+		Note that no checks are done to assert that the new log does not
+		overlap with an existing one.
+		"""
+		parser = Parser(datetime.now())
+		
+		start = parser.extract_datetime(start)
+		stop = parser.extract_datetime(stop)
+		if stop < start:
+			raise ValueError('Your time interval is negative')
+		
+		self.db.add_complete(start, stop, task)
+		
+		try:
+			self.db.add_task(task, start.year, start.month)
+		except ValueError:
+			pass
+		
+		return '\n'.join([
+			'added task {}'.format(task),
+			'start: {}'.format(prettify_datetime(start)),
+			'stop: {}'.format(prettify_datetime(stop))
+		])
 
 
 

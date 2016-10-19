@@ -2,11 +2,12 @@ from datetime import datetime, timedelta
 from itertools import permutations
 from unittest import TestCase
 
-from hypothesis.extra.datetime import dates
+from hypothesis.extra.datetime import dates, datetimes
 from hypothesis.strategies import just, sampled_from
 from hypothesis import given
 
-from stl.time import Parser, prettify_date, prettify_delta
+from stl.time import Parser
+from stl.time import prettify_date, prettify_datetime, prettify_delta
 
 
 
@@ -68,6 +69,14 @@ class ParserTestCase(TestCase):
 		self.assertEqual(year, self.now.year)
 		self.assertEqual(month, self.now.month)
 		self.assertEqual(day, self.now.day)
+	
+	
+	@given(datetimes(timezones=[]))
+	def test_extract_datetime(self, dt):
+		res = self.parser.extract_datetime(dt.isoformat())
+		
+		for prop in ['year', 'month', 'day', 'hour', 'minute']:
+			self.assertEqual(getattr(res, prop), getattr(dt, prop))
 
 
 
@@ -90,6 +99,21 @@ class PrettifyTestCase(TestCase):
 		year, month = self.parser.extract_month(s)
 		self.assertEqual(year, d.year)
 		self.assertEqual(month, d.month)
+	
+	
+	@given(datetimes(min_year=1000, timezones=[]))
+	def test_prettify_datetime(self, dt):
+		s = prettify_datetime(dt)
+		parts = s.rsplit(maxsplit=1)
+		
+		year, month, day = self.parser.extract_date(parts[0])
+		self.assertEqual(year, dt.year)
+		self.assertEqual(month, dt.month)
+		self.assertEqual(day, dt.day)
+		
+		hour, minute = map(int, parts[1].split(':'))
+		self.assertEqual(hour, dt.hour)
+		self.assertEqual(minute, dt.minute)
 	
 	
 	def test_prettify_delta(self):

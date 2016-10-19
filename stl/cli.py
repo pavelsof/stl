@@ -115,9 +115,9 @@ class Cli:
 			description='adds a time log')
 		
 		subp.add_argument('start',
-			help='when work on the task started; use %%Y-%%m-%%d %%H:%%M')
+			help='when work on the task started; use %%Y-%%m-%%dT%%H:%%M')
 		subp.add_argument('stop',
-			help='when work on the task stopped; use %%Y-%%m-%%d %%H:%%M')
+			help='when work on the task stopped; use %%Y-%%m-%%dT%%H:%%M')
 		subp.add_argument('task', nargs='?', default='',
 			help='the task being worked on; optional')
 		

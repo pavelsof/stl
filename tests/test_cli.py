@@ -43,9 +43,9 @@ class CliTestCase(TestCase):
 	def test_switch_does_not_break(self, d):
 		args = [value for value in d.values() if value]
 		
-		with patch.object(Core, 'switch') as mock_start:
+		with patch.object(Core, 'switch') as mock_switch:
 			self.cli.run(['switch'] + args)
-			mock_start.assert_called_once_with(task=d['task'])
+			mock_switch.assert_called_once_with(task=d['task'])
 	
 	
 	@given(fixed_dictionaries({
@@ -69,6 +69,21 @@ class CliTestCase(TestCase):
 		with patch.object(Core, 'status') as mock_status:
 			self.cli.run([d['command']] + args)
 			mock_status.assert_called_once_with(extra=extra)
+	
+	
+	@given(fixed_dictionaries({
+			'start': text(min_size=1).filter(lambda t: not t.startswith('-')),
+			'stop': text(min_size=1).filter(lambda t: not t.startswith('-')),
+			'task': text().filter(lambda t: not t.startswith('-')),
+			'verbose': sampled_from(['-v', '--verbose', ''])}))
+	def test_add_does_not_break(self, d):
+		args = [d['start'], d['stop']]
+		if d['task']: args.append(d['task'])
+		if d['verbose']: args.append(d['verbose'])
+		
+		with patch.object(Core, 'add') as mock_add:
+			self.cli.run(['add'] + args)
+			mock_add.assert_called_once_with(d['start'], d['stop'], d['task'])
 
 
 

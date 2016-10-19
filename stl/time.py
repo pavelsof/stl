@@ -5,6 +5,15 @@ import logging
 
 
 
+"""
+The str(f|p)time format for ISO datetime strings with minute-precision and the
+expected length for such strings.
+"""
+ISO_FORMAT = '%Y-%m-%dT%H:%M'
+ISO_FORMAT_LEN = 16
+
+
+
 class Parser:
 	"""
 	Provides methods for converting user input into time units.
@@ -13,7 +22,7 @@ class Parser:
 	def __init__(self, now):
 		"""
 		Constructor. Expects a datetime instance as argument; the Parser does
-		not check time itself.
+		not check the time itself.
 		"""
 		self.now = now
 		self.log = logging.getLogger(__name__)
@@ -139,6 +148,20 @@ class Parser:
 		
 		else:
 			raise ValueError('Could not infer date: {}'.format(s))
+	
+	
+	def extract_datetime(self, s):
+		"""
+		Returns a datetime instance extracted from the given string. Unlike the
+		previous few methods, this one only accepts ISO format strings (the
+		seconds being optional).
+		"""
+		try:
+			dt = datetime.strptime(s[:ISO_FORMAT_LEN], ISO_FORMAT)
+		except ValueError:
+			raise ValueError('Could not infer datetime: {}'.format(s))
+		
+		return dt
 
 
 
@@ -159,6 +182,18 @@ def prettify_date(year, month, day=None):
 		s = d.strftime('%b %Y')
 	
 	return s.lower()
+
+
+
+def prettify_datetime(dt):
+	"""
+	Returns a pretty string representing the given datetime instance. Units
+	smaller than minutes are not included.
+	"""
+	return ' '.join([
+		prettify_date(dt.year, dt.month, dt.day),
+		dt.strftime('%H:%M')
+	])
 
 
 
