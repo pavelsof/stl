@@ -153,11 +153,29 @@ class Database:
 		return {'start': start, 'stop': stop, 'task': task}
 	
 	
-	def add_complete(self, start, stop, task=''):
+	def _sort_lines(self, lines):
+		"""
+		Returns the given [] of closed log entry lines but sorted by the start
+		datetime. Note that the method expects and returns [] of [] of str.
+		"""
+		def sort_key_func(item):
+			try:
+				return datetime.strptime(item[0], DT_FORMAT)
+			except ValueError as err:
+				self.log.error(str(err))
+				raise ValueError
+		
+		return list(sorted(lines, key=sort_key_func))
+	
+	
+	def add_complete(self, start, stop, task='', append=True):
 		"""
 		Creates a new closed log entry. Expects two datetime instances, for
 		when work on the task started and stopped, respectively. The task
 		argument is optional.
+		
+		If append is True, then the new entry is appended to the end of the
+		respective db file. Otherwise, it is sorted into the right place.
 		"""
 		entry = [
 			start.strftime(DT_FORMAT).zfill(DT_FORMAT_LEN),
@@ -175,6 +193,13 @@ class Database:
 					data.append(line)
 		
 		data.append(entry)
+		
+		if not append:
+			try:
+				data = self._sort_lines(data)
+			except ValueError:
+				message = 'Could not read the file for {}.{}'
+				raise DatabaseError(message.format(start.year, start.month))
 		
 		with open(path, 'w', newline='') as f:
 			writer = csv.writer(f, delimiter='\t')
@@ -202,8 +227,8 @@ class Database:
 				try:
 					entry = self._read_entry(line)
 				except ValueError:
-					raise DatabaseError(
-						'Could not read the file for '+str(year)+'.'+str(month))
+					message = 'Could not read the file for {}.{}'
+					raise DatabaseError(message.format(year, month))
 				else:
 					li.append(entry)
 		

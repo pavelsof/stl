@@ -67,9 +67,41 @@ class DatabaseTestCase(TestCase):
 	def test_add_complete(self, dt1, dt2, t):
 		self.db.add_complete(dt1, dt2, t)
 		
+		logs = self.db.get_month(dt1.year, dt1.month)
+		self.assertEqual(len(logs), 1)
+		self._check_dt_equal(logs[0]['start'], dt1)
+		self._check_dt_equal(logs[0]['stop'], dt2)
+		self.assertEqual(logs[0]['task'], self.db._sanitise_text(t))
+		
 		path = os.path.join(self.temp_dir.name,
 			str(dt1.year).zfill(4), str(dt1.month).zfill(2))
 		self.assertTrue(os.path.exists(path))
+		os.remove(path)
+	
+	
+	@given(lists(fixed_dictionaries({
+			'start': datetimes(min_year=2000, max_year=2000, timezones=[]),
+			'stop': datetimes(min_year=2000, max_year=2000, timezones=[]),
+			'task': text()})))
+	def test_add_complete_with_sort(self, li):
+		for d in li:
+			self.db.add_complete(d['start'], d['stop'], d['task'], append=False)
+		
+		for month in range(1, 13):
+			month_li = list(filter(lambda d: d['start'].month == month, li))
+			month_li = list(sorted(month_li, key=lambda d: d['start']))
+			
+			logs = self.db.get_month(2000, month)
+			self.assertEqual(len(logs), len(month_li))
+			
+			for i in range(0, len(logs)):
+				self._check_dt_equal(logs[i]['start'], month_li[i]['start'])
+				self._check_dt_equal(logs[i]['stop'], month_li[i]['stop'])
+				self.assertEqual(logs[i]['task'], self.db._sanitise_text(month_li[i]['task']))
+		
+		year_dir = os.path.join(self.temp_dir.name, '2000')
+		if os.path.exists(year_dir):
+			shutil.rmtree(year_dir)
 	
 	
 	@given(lists(fixed_dictionaries({
