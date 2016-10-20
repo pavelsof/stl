@@ -4,6 +4,12 @@ import shutil
 import subprocess
 
 
+"""
+If echo $EDITOR is None, these will be tried in order.
+"""
+FALLBACK_EDITORS = ['vim', 'vi']
+
+
 
 class SpawnError(ValueError):
 	"""
@@ -27,13 +33,14 @@ class Spawner:
 	
 	def _get_editor(self):
 		"""
-		Returns the command that invokes the user's favourite editor. If there
-		is no environment variable pointing to an editor, it tries vim.
+		Returns the command that invokes the user's (hopefully) favourite
+		editor. If there is no environment variable $EDITOR, it tries some
+		fallbacks. If that fails, a SpawnError is raised.
 		"""
 		if 'EDITOR' in os.environ:
 			return os.environ['EDITOR']
 		
-		for editor in ['vim', 'vi']:
+		for editor in FALLBACK_EDITORS:
 			if shutil.which(editor):
 				return editor
 		
@@ -48,10 +55,13 @@ class Spawner:
 		args = [self._get_editor(), os.path.abspath(file_path)]
 		
 		try:
-			subprocess.run(args)
+			subprocess.run(args, check=True)
 		except OSError as err:
 			self.log.error(str(err))
 			raise SpawnError('Could not run {}'.format(args[0]))
+		except subprocess.CalledProcessError as err:
+			self.log.error(str(err))
+			raise SpawnError('Could not close {} normally'.format(args[0]))
 
 
 

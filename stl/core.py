@@ -4,8 +4,8 @@ import logging.config
 import logging
 import os
 
-from stl.db import DatabaseError, Database
-from stl.spawn import SpawnError, Spawner
+from stl.db import Database
+from stl.spawn import Spawner
 from stl.status import Status
 from stl.time import Parser
 from stl.time import prettify_date, prettify_datetime, prettify_delta
@@ -212,7 +212,7 @@ class Core:
 		Invokes the user's favourite text editor to open the file corresponding
 		to the specified year and month.
 		"""
-		parser = Parser()
+		parser = Parser(datetime.now())
 		year, month = parser.extract_month(month)
 		
 		file_path = self.db._get_path(year, month)

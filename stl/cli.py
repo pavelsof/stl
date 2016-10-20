@@ -153,7 +153,7 @@ class Cli:
 		"""
 		args = self.parser.parse_args(raw_args)
 		
-		if 'command' not in args:
+		if args.command is None:
 			return self.parser.format_help()
 		
 		core = Core(verbose=args.verbose)
@@ -175,7 +175,7 @@ def main():
 	"""
 	cli = Cli()
 	res = cli.run()
-	if res: print(res)
+	if res: print(res.strip())
 
 
 
