@@ -1,12 +1,14 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import logging.config
 import logging
 import os
 
 from stl.db import DatabaseError, Database
+from stl.spawn import SpawnError, Spawner
 from stl.status import Status
-from stl.time import Parser, prettify_datetime, prettify_delta
+from stl.time import Parser
+from stl.time import prettify_date, prettify_datetime, prettify_delta
 
 
 
@@ -184,7 +186,7 @@ class Core:
 		Note that no checks are done to assert that the new log does not
 		overlap with an existing one.
 		"""
-		parser = Parser(datetime.now())
+		parser = Parser()
 		
 		start = parser.extract_datetime(start)
 		stop = parser.extract_datetime(stop)
@@ -203,6 +205,23 @@ class Core:
 			'start: {}'.format(prettify_datetime(start)),
 			'stop: {}'.format(prettify_datetime(stop))
 		])
+	
+	
+	def edit(self, month):
+		"""
+		Invokes the user's favourite text editor to open the file corresponding
+		to the specified year and month.
+		"""
+		parser = Parser()
+		year, month = parser.extract_month(month)
+		
+		file_path = self.db._get_path(year, month)
+		if not os.path.exists(file_path):
+			message = 'There are no logs for {}'
+			raise ValueError(message.format(prettify_date(year, month)))
+		
+		spawner = Spawner()
+		spawner.edit(file_path)
 
 
 

@@ -19,7 +19,7 @@ class Parser:
 	Provides methods for converting user input into time units.
 	"""
 	
-	def __init__(self, now):
+	def __init__(self, now=None):
 		"""
 		Constructor. Expects a datetime instance as argument; the Parser does
 		not check the time itself.

@@ -130,10 +130,14 @@ class Cli:
 		Inits the subparser that handles the edit command.
 		"""
 		def edit(core, args):
-			return core.edit()
+			month = ' '.join(getattr(args, 'month', []))
+			core.edit(month)
 		
 		subp = self.subparsers.add_parser('edit',
 			description='lets you vim the right file')
+		
+		subp.add_argument('month', nargs='*',
+			help='the month you want to edit, e.g. oct 2016')
 		
 		subp.add_argument('-v', '--verbose', action='store_true')
 		subp.set_defaults(func=edit)
@@ -170,7 +174,8 @@ def main():
 	output to stdout.
 	"""
 	cli = Cli()
-	print(cli.run())
+	res = cli.run()
+	if res: print(res)
 
 
 

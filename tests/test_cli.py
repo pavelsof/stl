@@ -51,8 +51,12 @@ class CliTestCase(TestCase):
 	@given(fixed_dictionaries({
 			'command': sampled_from(['status', 'show']),
 			'extra': one_of(
-				tuples(just('day'), sampled_from(['-d', '--day']), text(min_size=1)),
-				tuples(just('month'), sampled_from(['-m', '--month']), text(min_size=1)),
+				tuples(just('day'),
+					sampled_from(['-d', '--day']),
+					text(min_size=1).filter(lambda t: not t.startswith('-'))),
+				tuples(just('month'),
+					sampled_from(['-m', '--month']),
+					text(min_size=1).filter(lambda t: not t.startswith('-'))),
 				tuples(just('task'),
 					sampled_from(['-t', '--task']),
 					text(min_size=1).filter(lambda t: not t.startswith('-'))),
@@ -84,6 +88,17 @@ class CliTestCase(TestCase):
 		with patch.object(Core, 'add') as mock_add:
 			self.cli.run(['add'] + args)
 			mock_add.assert_called_once_with(d['start'], d['stop'], d['task'])
+	
+	
+	@given(fixed_dictionaries({
+			'month': text().filter(lambda t: not t.startswith('-')),
+			'verbose': sampled_from(['-v', '--verbose', ''])}))
+	def test_edit_does_not_break(self, d):
+		args = [value for value in d.values() if value]
+		
+		with patch.object(Core, 'edit') as mock_edit:
+			self.cli.run(['edit'] + args)
+			mock_edit.assert_called_once_with(d['month'])
 
 
 
