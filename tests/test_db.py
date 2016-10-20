@@ -24,17 +24,19 @@ class DatabaseTestCase(TestCase):
 	def tearDown(self):
 		self.temp_dir.cleanup()
 	
-	def _check_dt_equal(self, dt1, dt2):
+	def _check_dt_equal(self, dt1, dt2, seconds=False):
 		self.assertEqual(dt1.year, dt2.year)
 		self.assertEqual(dt1.month, dt2.month)
 		self.assertEqual(dt1.day, dt2.day)
 		self.assertEqual(dt1.hour, dt2.hour)
 		self.assertEqual(dt1.minute, dt2.minute)
+		if seconds:
+			self.assertEqual(dt1.second, dt2.second)
 	
 	
 	@given(datetimes(allow_naive=True, timezones=[]))
 	def test_get_path_with_create(self, dt):
-		file_path = self.db._get_path(dt.year, dt.month, create=True)
+		file_path = self.db.get_path(dt.year, dt.month, create=True)
 		dir_path = os.path.dirname(file_path)
 		self.assertTrue(os.path.exists(dir_path))
 	
@@ -44,7 +46,7 @@ class DatabaseTestCase(TestCase):
 		self.db.add_current(dt, t)
 		
 		entry = self.db.get_current()
-		self._check_dt_equal(entry['stamp'], dt)
+		self._check_dt_equal(entry['stamp'], dt, seconds=True)
 		self.assertEqual(entry['task'], self.db._sanitise_text(t))
 		
 		path = os.path.join(self.temp_dir.name, 'current')

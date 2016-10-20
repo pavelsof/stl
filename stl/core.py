@@ -215,7 +215,7 @@ class Core:
 		parser = Parser(datetime.now())
 		year, month = parser.extract_month(month)
 		
-		file_path = self.db._get_path(year, month)
+		file_path = self.db.get_path(year, month)
 		if not os.path.exists(file_path):
 			message = 'There are no logs for {}'
 			raise ValueError(message.format(prettify_date(year, month)))

@@ -11,8 +11,11 @@ import os
 The str(f|p)time format used in the database files and the expected length of
 the formatted strings.
 """
-DT_FORMAT = '%Y-%m-%d %H:%M:%S'
-DT_FORMAT_LEN = 19
+CURRENT_DT_FORMAT = '%Y-%m-%d %H:%M:%S'
+CURRENT_DT_FORMAT_LEN = 19
+
+ARCHIVE_DT_FORMAT = '%Y-%m-%d %H:%M'
+ARCHIVE_DT_FORMAT_LEN = 16
 
 
 
@@ -27,10 +30,10 @@ class DatabaseError(ValueError):
 class Database:
 	"""
 	Handles adding and retrieving log entries. There are two types of log
-	entries depending on whether the task is stopped (closed) or not (open).
-	There can be only one open entry at a time and it is kept in a single file
-	named `current`. The closed ones are kept separately, one file per month,
-	grouped in directories by year.
+	entries depending on whether the task is stopped (archive) or not
+	(current). There can be only one current log entry at a time and it is kept
+	in a single file named `current`. The archive log entries are kept
+	separately, one file per month, grouped in directories by year.
 	"""
 	
 	def __init__(self, dir_path):
@@ -51,19 +54,19 @@ class Database:
 	
 	
 	"""
-	Methods handling the current file
+	Methods handling the current log
 	"""
 	def add_current(self, stamp, task=''):
 		"""
-		Creates a new open log entry. Expects a datetime instance with the time
-		of starting the task. The task argument is optional.
+		Creates a new current log entry. Expects a datetime instance with the
+		time of starting the task. The task argument is optional.
 		
-		Note that the contents of the `current` file are overwritten.
+		Note that the contents of the `current` file are silently overwritten.
 		"""
 		path = os.path.join(self.dir_path, 'current')
 		
 		entry = [
-			stamp.strftime(DT_FORMAT).zfill(DT_FORMAT_LEN),
+			stamp.strftime(CURRENT_DT_FORMAT).zfill(CURRENT_DT_FORMAT_LEN),
 			self._sanitise_text(task)
 		]
 		
@@ -76,9 +79,9 @@ class Database:
 	
 	def get_current(self, delete=False):
 		"""
-		Returns {stamp, task} of the currently open log entry or None if there
-		is not such. The entry will be removed from the database file if the
-		delete flag is set.
+		Returns {stamp, task} of the current log entry or None if there is not
+		such. The entry will be removed from the database file if the delete
+		flag is set.
 		"""
 		path = os.path.join(self.dir_path, 'current')
 		
@@ -100,7 +103,7 @@ class Database:
 			raise DatabaseError('Multiple current log entries found')
 		
 		try:
-			entry['stamp'] = datetime.strptime(lines[0][0], DT_FORMAT)
+			entry['stamp'] = datetime.strptime(lines[0][0], CURRENT_DT_FORMAT)
 		except ValueError as err:
 			self.log.error(str(err))
 			raise DatabaseError('Could not read the current db file')
@@ -116,12 +119,12 @@ class Database:
 	
 	
 	"""
-	Methods handling the archive files
+	Methods handling the archive logs
 	"""
-	def _get_path(self, year, month, create=False):
+	def get_path(self, year, month, create=False):
 		"""
-		Returns the absolute path to the file containing the logs for the given
-		year and month.
+		Returns the absolute path to the file containing the archive log
+		entries for the given year and month.
 		"""
 		year_dir = os.path.join(self.dir_path, str(year).zfill(4))
 		
@@ -138,13 +141,13 @@ class Database:
 	
 	def _read_entry(self, line):
 		"""
-		De-serialises a raw closed log file line and returns {start, stop,
+		De-serialises a raw archive log file line and returns {start, stop,
 		task}, the first two being naive datetime instances.
 		"""
 		try:
 			assert len(line) == 3
-			start = datetime.strptime(line[0], DT_FORMAT)
-			stop = datetime.strptime(line[1], DT_FORMAT)
+			start = datetime.strptime(line[0], ARCHIVE_DT_FORMAT)
+			stop = datetime.strptime(line[1], ARCHIVE_DT_FORMAT)
 			task = str(line[2])
 		except (AssertionError, ValueError) as err:
 			self.log.error(str(err))
@@ -155,12 +158,12 @@ class Database:
 	
 	def _sort_lines(self, lines):
 		"""
-		Returns the given [] of closed log entry lines but sorted by the start
+		Returns the given [] of archive log file lines but sorted by the start
 		datetime. Note that the method expects and returns [] of [] of str.
 		"""
 		def sort_key_func(item):
 			try:
-				return datetime.strptime(item[0], DT_FORMAT)
+				return datetime.strptime(item[0], ARCHIVE_DT_FORMAT)
 			except ValueError as err:
 				self.log.error(str(err))
 				raise ValueError
@@ -170,7 +173,7 @@ class Database:
 	
 	def add_complete(self, start, stop, task='', append=True):
 		"""
-		Creates a new closed log entry. Expects two datetime instances, for
+		Creates a new archive log entry. Expects two datetime instances, for
 		when work on the task started and stopped, respectively. The task
 		argument is optional.
 		
@@ -178,12 +181,12 @@ class Database:
 		respective db file. Otherwise, it is sorted into the right place.
 		"""
 		entry = [
-			start.strftime(DT_FORMAT).zfill(DT_FORMAT_LEN),
-			stop.strftime(DT_FORMAT).zfill(DT_FORMAT_LEN),
+			start.strftime(ARCHIVE_DT_FORMAT).zfill(ARCHIVE_DT_FORMAT_LEN),
+			stop.strftime(ARCHIVE_DT_FORMAT).zfill(ARCHIVE_DT_FORMAT_LEN),
 			self._sanitise_text(task)
 		]
 		
-		path = self._get_path(start.year, start.month, create=True)
+		path = self.get_path(start.year, start.month, create=True)
 		data = []
 		
 		if os.path.exists(path):
@@ -211,10 +214,10 @@ class Database:
 	
 	def get_month(self, year, month):
 		"""
-		Returns the [] of {start, stop, task} for the closed log entries for
+		Returns the [] of {start, stop, task} for the archive log entries for
 		the given month. The [] is sorted by the start datetime.
 		"""
-		path = self._get_path(year, month)
+		path = self.get_path(year, month)
 		
 		if not os.path.exists(path):
 			return []
@@ -237,7 +240,7 @@ class Database:
 	
 	def get_day(self, year, month, day):
 		"""
-		Returns the [] of {start, stop, task} for the closed log entries for
+		Returns the [] of {start, stop, task} for the archive log entries for
 		the given date. The [] is sorted by the start datetime.
 		"""
 		return list(filter(lambda d: d['start'].day == day,
@@ -246,7 +249,7 @@ class Database:
 	
 	def get_year(self, year):
 		"""
-		Returns the [] of {start, stop, task} for the closed log entries for
+		Returns the [] of {start, stop, task} for the archive log entries for
 		the given year. The [] is sorted by the start datetime.
 		"""
 		return [item
@@ -316,7 +319,7 @@ class Database:
 	def get_task(self, task):
 		"""
 		Returns the [] of (year, month) tuples for which the given task has
-		closed log entries.
+		archive log entries.
 		"""
 		task = self._sanitise_text(task)
 		if not len(task):

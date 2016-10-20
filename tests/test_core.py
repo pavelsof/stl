@@ -29,13 +29,14 @@ class CoreTestCase(TestCase):
 	def tearDown(self):
 		self.temp_dir.cleanup()
 	
-	def _check_dt_equal(self, dt1, dt2):
+	def _check_dt_equal(self, dt1, dt2, seconds=False):
 		self.assertEqual(dt1.year, dt2.year)
 		self.assertEqual(dt1.month, dt2.month)
 		self.assertEqual(dt1.day, dt2.day)
 		self.assertEqual(dt1.hour, dt2.hour)
 		self.assertEqual(dt1.minute, dt2.minute)
-		# self.assertEqual(dt1.second, dt2.second)
+		if seconds:
+			self.assertEqual(dt1.second, dt2.second)
 	
 	
 	@given(datetimes(timezones=[]), text())
@@ -47,7 +48,7 @@ class CoreTestCase(TestCase):
 			self.core.start(t, now=dt)
 		
 		entry = self.core.db.get_current(delete=True)
-		self._check_dt_equal(entry['stamp'], dt)
+		self._check_dt_equal(entry['stamp'], dt, seconds=True)
 		self.assertEqual(entry['task'], self.core.db._sanitise_text(t))
 	
 	
