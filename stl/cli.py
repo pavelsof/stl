@@ -86,7 +86,7 @@ class Cli:
 		def status(core, args):
 			extra = None
 			
-			for key in ['day', 'month', 'task']:
+			for key in ['day', 'month', 'year', 'task']:
 				if getattr(args, key) is not None:
 					extra = (key, ' '.join(getattr(args, key)))
 					break
@@ -98,6 +98,7 @@ class Cli:
 		group = subp.add_mutually_exclusive_group()
 		group.add_argument('-d', '--day', nargs='*')
 		group.add_argument('-m', '--month', nargs='*')
+		group.add_argument('-y', '--year', nargs='*')
 		group.add_argument('-t', '--task', nargs=1)
 		
 		subp.add_argument('-v', '--verbose', action='store_true')

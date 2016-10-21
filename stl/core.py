@@ -154,7 +154,7 @@ class Core:
 		"""
 		Returns a human-readable string with status information. The optional
 		argument can be a (key, value) tuple, with the key being one of ('day',
-		'week', 'month', 'task').
+		'week', 'month', 'year', 'task').
 		"""
 		if now is None:
 			now = datetime.now()
@@ -176,6 +176,9 @@ class Core:
 		elif key == 'month':
 			year, month = parser.extract_month(value)
 			return status.get_month_info(year, month)
+		elif key == 'year':
+			year = parser.extract_year(value)
+			return status.get_year_info(year)
 	
 	
 	def add(self, start, stop, task=''):

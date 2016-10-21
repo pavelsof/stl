@@ -98,6 +98,17 @@ class Parser:
 			return dt.day
 	
 	
+	def extract_year(self, s):
+		"""
+		Returns the year extracted from the given string. Raises ValueError if
+		unsuccessful.
+		"""
+		if not len(s):
+			return self.now.year
+		else:
+			return self._get_year(s)
+	
+	
 	def extract_month(self, s):
 		"""
 		Returns a (year, month) tuple extracted form the given string. Raises

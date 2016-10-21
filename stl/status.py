@@ -111,6 +111,18 @@ class Status:
 		])
 	
 	
+	def get_year_info(self, year):
+		"""
+		Returns a human-readable string containing info about the work done
+		during the given year.
+		"""
+		logs = self.db.get_year(year)
+		return '\n'.join([
+			'[{}]'.format(year),
+			self._get_time_info(logs)
+		])
+	
+	
 	def get_task_info(self, task):
 		"""
 		Returns a human-readable string containing info about the hours worked

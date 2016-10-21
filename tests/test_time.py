@@ -18,6 +18,13 @@ class ParserTestCase(TestCase):
 		self.parser = Parser(self.now)
 	
 	
+	@given(dates(min_year=1000))
+	def test_extract_year(self, d):
+		s = d.strftime('%Y')
+		year = self.parser.extract_year(s)
+		self.assertEqual(year, d.year)
+	
+	
 	@given(dates(min_year=1000),
 			just('%Y'),
 			sampled_from(['%m', '%b', '%B']))
@@ -61,6 +68,9 @@ class ParserTestCase(TestCase):
 	
 	
 	def test_extract_empty_strings(self):
+		year = self.parser.extract_year('')
+		self.assertEqual(year, self.now.year)
+		
 		year, month = self.parser.extract_month('')
 		self.assertEqual(year, self.now.year)
 		self.assertEqual(month, self.now.month)
