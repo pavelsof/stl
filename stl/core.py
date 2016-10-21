@@ -180,20 +180,25 @@ class Core:
 	
 	def add(self, start, stop, task=''):
 		"""
-		Adds a time log to the database. Expects two ISO format strings that
-		specifiy the time interval, and, optionally, the name of the task.
+		Adds a time log to the database. Expects either ISO format strings or
+		datetime instances that specifiy the time interval. The name of the
+		task is optional.
 		
 		Note that no checks are done to assert that the new log does not
 		overlap with an existing one.
 		"""
 		parser = Parser()
 		
-		start = parser.extract_datetime(start)
-		stop = parser.extract_datetime(stop)
+		if not isinstance(start, datetime):
+			start = parser.extract_datetime(start)
+		
+		if not isinstance(stop, datetime):
+			stop = parser.extract_datetime(stop)
+		
 		if stop < start:
 			raise ValueError('Your time interval is negative')
 		
-		self.db.add_complete(start, stop, task)
+		self.db.add_complete(start, stop, task, append=False)
 		
 		try:
 			self.db.add_task(task, start.year, start.month)
