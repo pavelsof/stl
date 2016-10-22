@@ -106,7 +106,7 @@ class Parser:
 		if not len(s):
 			return self.now.year
 		
-		if s == 'last':
+		if s.lower() == 'last':
 			return self.now.year-1
 		
 		return self._get_year(s)
@@ -123,7 +123,7 @@ class Parser:
 			return self.now.year, self.now.month
 		
 		elif len(li) == 1:
-			if s == 'last':
+			if s.lower() == 'last':
 				month = self.now.month-1
 			else:
 				month = self._get_month(s)
@@ -139,6 +139,30 @@ class Parser:
 		
 		else:
 			raise ValueError('Could not infer month: {}'.format(s))
+	
+	
+	def extract_week(self, s):
+		"""
+		Returns a (year, week number) tuple extracted from the given string.
+		Raises ValueError if unsuccessful.
+		"""
+		li = s.split()
+		
+		if len(li) == 0:
+			return self.now.year, self.now.isocalendar()[1]
+		
+		elif len(li) == 1:
+			if s.lower() == 'last':
+				week = self.now.isocalendar()[1]-1
+			elif s.lower() == 'this':
+				week = self.now.isocalendar()[1]
+			else:
+				raise ValueError('Could not infer week: {}'.format(s))
+			
+			return self.now.year, week
+		
+		else:
+			raise ValueError('Could not infer week: {}'.format(s))
 	
 	
 	def extract_date(self, s):
@@ -162,9 +186,9 @@ class Parser:
 			else:
 				return dt.year, dt.month, dt.day
 			
-			if s in ['yesterday', 'last']:
+			if s.lower() in ['yesterday', 'last']:
 				day = self.now.day-1
-			elif s == 'today':
+			elif s.lower() == 'today':
 				day = self.now.day
 			else:
 				day = self._get_day(li[0])

@@ -112,7 +112,7 @@ class Cli:
 		def status(core, args):
 			extra = None
 			
-			for key in ['day', 'month', 'year', 'task']:
+			for key in ['day', 'week', 'month', 'year', 'task']:
 				if getattr(args, key) is not None:
 					extra = (key, ' '.join(getattr(args, key)))
 					break
@@ -130,12 +130,22 @@ class Cli:
 			usage=usage, description=desc, help=desc[:desc.find(';')])
 		
 		group = subp.add_mutually_exclusive_group()
-		group.add_argument('-d', '--day', nargs=argparse.REMAINDER,
-			help='report for the given day, e.g. 15 oct, 2016-10-15, today, yesterday')
-		group.add_argument('-m', '--month', nargs=argparse.REMAINDER,
-			help='report for the given month, e.g. oct, 10, 10 2016, last')
-		group.add_argument('-y', '--year', nargs=argparse.REMAINDER,
-			help='report for the given year, e.g. 2016, last')
+		group.add_argument('-d', '--day', nargs=argparse.REMAINDER, help=(
+			'report for the given day, '
+			'e.g. 15 oct, 2016-10-15, today, yesterday; '
+			'empty string defaults to today'))
+		group.add_argument('-w', '--week', nargs=argparse.REMAINDER, help=(
+			'report for the given week, '
+			'possible values are this and last; '
+			'empty string defaults to this week'))
+		group.add_argument('-m', '--month', nargs=argparse.REMAINDER, help=(
+			'report for the given month, '
+			'e.g. oct, 10, 10 2016, last; '
+			'empty string defaults to this month'))
+		group.add_argument('-y', '--year', nargs=argparse.REMAINDER, help=(
+			'report for the given year, '
+			'e.g. 2016, last; '
+			'empty string defaults to this year'))
 		group.add_argument('-t', '--task', nargs=argparse.REMAINDER,
 			help='report for the given task')
 		

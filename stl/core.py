@@ -173,6 +173,9 @@ class Core:
 		if key == 'day':
 			year, month, day = parser.extract_date(value)
 			return status.get_day_info(year, month, day)
+		elif key == 'week':
+			year, week = parser.extract_week(value)
+			return status.get_week_info(year, week)
 		elif key == 'month':
 			year, month = parser.extract_month(value)
 			return status.get_month_info(year, month)

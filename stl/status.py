@@ -1,9 +1,9 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import reduce
 
 import logging
 
-from stl.time import prettify_date, prettify_delta
+from stl.time import prettify_date, prettify_datetime, prettify_delta
 
 
 
@@ -96,7 +96,21 @@ class Status:
 		Returns a human-readable string containing info about the work done
 		during the given week.
 		"""
-		pass
+		logs = []
+		dts = []
+		
+		for weekday in [1, 2, 3, 4, 5, 6, 0]:
+			dt = datetime.strptime('{} {} {}'.format(year, week, weekday), '%Y %W %w')
+			logs.extend(self.db.get_day(dt.year, dt.month, dt.day))
+			dts.append(dt)
+		
+		pretty_monday = prettify_date(dts[0].year, dts[0].month, dts[0].day)
+		pretty_sunday = prettify_date(dts[-1].year, dts[-1].month, dts[-1].day)
+		
+		return '\n'.join([
+			'[{} to {}]'.format(pretty_monday, pretty_sunday),
+			self._get_time_info(logs)
+		])
 	
 	
 	def get_month_info(self, year, month):
@@ -146,8 +160,8 @@ class Status:
 		
 		return '\n'.join([
 			'[{}]'.format(task),
-			'started: {}'.format(started),
-			'last mod: {}'.format(last_mod),
+			'started: {}'.format(prettify_datetime(started)),
+			'last mod: {}'.format(prettify_datetime(last_mod)),
 			'total: {}'.format(prettify_delta(hours))
 		])
 
