@@ -36,6 +36,12 @@ dependencies. The data is stored in human-readable files in either
 `~/.config/stl` or `~/.stl` (if there is not a `~/.config` dir already).
 
 
+## similar projects
+
+* [timeflow](https://github.com/trimailov/timeflow): also python but somewhat
+  different approach.
+
+
 ## licence
 
 MIT. Do as you please and praise the snake gods.

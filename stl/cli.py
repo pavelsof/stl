@@ -19,8 +19,18 @@ class Cli:
 		the argparse args as arguments, which function will be called if the
 		respective command is called.
 		"""
-		self.parser = argparse.ArgumentParser()
-		self.subparsers = self.parser.add_subparsers(dest='command')
+		usage = 'stl [-v] subcommand'
+		desc = (
+			'stl is a simple time logger that enables you to '
+			'keep tally of how many hours you have worked on this or that'
+		)
+		
+		self.parser = argparse.ArgumentParser(usage=usage, description=desc)
+		self.parser.add_argument('-v', '--verbose', action='store_true',
+			help='prints debug info; if used, it must precede the other arguments')
+		
+		self.subparsers = self.parser.add_subparsers(dest='command',
+			title='subcommands')
 		
 		self._init_start()
 		self._init_stop()
@@ -37,14 +47,20 @@ class Cli:
 		Inits the subparser that handles the start command.
 		"""
 		def start(core, args):
-			task = args.task if args.task else ''
+			task = ' '.join(args.task) if args.task else ''
 			return core.start(task=task)
 		
-		subp = self.subparsers.add_parser('start')
-		subp.add_argument('task', nargs='?',
+		usage = 'stl start [task]'
+		desc = (
+			'make a log that you are starting to work'
+		)
+		
+		subp = self.subparsers.add_parser('start', usage=usage,
+			description=desc, help=desc)
+		
+		subp.add_argument('task', nargs=argparse.REMAINDER,
 			help='the task that you are about to start working on')
 		
-		subp.add_argument('-v', '--verbose', action='store_true')
 		subp.set_defaults(func=start)
 	
 	
@@ -55,11 +71,14 @@ class Cli:
 		def stop(core, args):
 			return core.stop()
 		
-		subp = self.subparsers.add_parser('stop')
-		subp.add_argument('task', nargs='?',
-			help='the task you are about to stop working on')
+		usage = 'stl stop'
+		desc = (
+			'make a log that you just stopped working'
+		)
 		
-		subp.add_argument('-v', '--verbose', action='store_true')
+		subp = self.subparsers.add_parser('stop', usage=usage,
+			description=desc, help=desc)
+		
 		subp.set_defaults(func=stop)
 	
 	
@@ -68,14 +87,21 @@ class Cli:
 		Inits the subparser that handles the switch command.
 		"""
 		def switch(core, args):
-			task = args.task if args.task else ''
+			task = ' '.join(args.task) if args.task else ''
 			return core.switch(task=task)
 		
-		subp = self.subparsers.add_parser('switch')
-		subp.add_argument('task', nargs='?',
+		usage = 'stl switch [task]'
+		desc = (
+			'shortcut for stl stop && stl start; '
+			'stop the current task and immediately start another one'
+		)
+		
+		subp = self.subparsers.add_parser('switch', usage=usage,
+			description=desc, help=desc[:desc.find(';')])
+		
+		subp.add_argument('task', nargs=argparse.REMAINDER,
 			help='the task that you are about to start working on')
 		
-		subp.add_argument('-v', '--verbose', action='store_true')
 		subp.set_defaults(func=switch)
 	
 	
@@ -93,15 +119,26 @@ class Cli:
 			
 			return core.status(extra=extra)
 		
-		subp = self.subparsers.add_parser('status', aliases=['show'])
+		usage = 'stl (status|show) [-d ... | -m ... | -y ... | -t ...]'
+		desc = (
+			'show a status report; '
+			'when called without further arguments, '
+			'it will tell you what you are doing now'
+		)
+		
+		subp = self.subparsers.add_parser('status', aliases=['show'],
+			usage=usage, description=desc, help=desc[:desc.find(';')])
 		
 		group = subp.add_mutually_exclusive_group()
-		group.add_argument('-d', '--day', nargs='*')
-		group.add_argument('-m', '--month', nargs='*')
-		group.add_argument('-y', '--year', nargs='*')
-		group.add_argument('-t', '--task', nargs=1)
+		group.add_argument('-d', '--day', nargs=argparse.REMAINDER,
+			help='report for the given day, e.g. 15 oct, today, yesterday')
+		group.add_argument('-m', '--month', nargs=argparse.REMAINDER,
+			help='report for the given month, e.g. oct, 2016 10')
+		group.add_argument('-y', '--year', nargs=argparse.REMAINDER,
+			help='report for the given year, e.g. 2016')
+		group.add_argument('-t', '--task', nargs=argparse.REMAINDER,
+			help='report for the given task')
 		
-		subp.add_argument('-v', '--verbose', action='store_true')
 		subp.set_defaults(func=status)
 	
 	
@@ -112,8 +149,15 @@ class Cli:
 		def add(core, args):
 			return core.add(args.start, args.stop, args.task)
 		
-		subp = self.subparsers.add_parser('add',
-			description='adds a time log')
+		usage = 'stl add start stop [task]'
+		desc = (
+			'directly add a log entry; '
+			'you can also do this from python, take a look at '
+			'stl.core.Core.add()'
+		)
+		
+		subp = self.subparsers.add_parser('add', usage=usage,
+			description=desc, help=desc[:desc.find(';')])
 		
 		subp.add_argument('start',
 			help='when work on the task started; use %%Y-%%m-%%dT%%H:%%M')
@@ -122,7 +166,6 @@ class Cli:
 		subp.add_argument('task', nargs='?', default='',
 			help='the task being worked on; optional')
 		
-		subp.add_argument('-v', '--verbose', action='store_true')
 		subp.set_defaults(func=add)
 	
 	
@@ -134,13 +177,17 @@ class Cli:
 			month = ' '.join(getattr(args, 'month', []))
 			core.edit(month)
 		
-		subp = self.subparsers.add_parser('edit',
-			description='lets you vim the right file')
+		usage = 'stl edit [month]'
+		desc = (
+			'lets you vim the right file'
+		)
 		
-		subp.add_argument('month', nargs='*',
+		subp = self.subparsers.add_parser('edit', usage=usage,
+			description=desc, help=desc)
+		
+		subp.add_argument('month', nargs=argparse.REMAINDER,
 			help='the month you want to edit, e.g. oct 2016')
 		
-		subp.add_argument('-v', '--verbose', action='store_true')
 		subp.set_defaults(func=edit)
 	
 	
