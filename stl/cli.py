@@ -131,11 +131,11 @@ class Cli:
 		
 		group = subp.add_mutually_exclusive_group()
 		group.add_argument('-d', '--day', nargs=argparse.REMAINDER,
-			help='report for the given day, e.g. 15 oct, today, yesterday')
+			help='report for the given day, e.g. 15 oct, 2016-10-15, today, yesterday')
 		group.add_argument('-m', '--month', nargs=argparse.REMAINDER,
-			help='report for the given month, e.g. oct, 2016 10')
+			help='report for the given month, e.g. oct, 10, 10 2016, last')
 		group.add_argument('-y', '--year', nargs=argparse.REMAINDER,
-			help='report for the given year, e.g. 2016')
+			help='report for the given year, e.g. 2016, last')
 		group.add_argument('-t', '--task', nargs=argparse.REMAINDER,
 			help='report for the given task')
 		

@@ -105,8 +105,11 @@ class Parser:
 		"""
 		if not len(s):
 			return self.now.year
-		else:
-			return self._get_year(s)
+		
+		if s == 'last':
+			return self.now.year-1
+		
+		return self._get_year(s)
 	
 	
 	def extract_month(self, s):
@@ -118,8 +121,15 @@ class Parser:
 		
 		if len(li) == 0:
 			return self.now.year, self.now.month
+		
 		elif len(li) == 1:
-			return self.now.year, self._get_month(s)
+			if s == 'last':
+				month = self.now.month-1
+			else:
+				month = self._get_month(s)
+			
+			return self.now.year, month
+		
 		elif len(li) == 2:
 			combos = self._try([self._get_year, self._get_month], li)
 			if len(combos) != 1:
@@ -135,13 +145,31 @@ class Parser:
 		"""
 		Returns a (year, month, day) tuple extracted from the given string.
 		Raises ValueError if unsuccessful.
+		
+		Apart from the _get_(year|month|day) permutations, this method also
+		recognises the ISO date format and words like today and yesterday.
 		"""
 		li = s.split()
 		
 		if len(li) == 0:
 			return self.now.year, self.now.month, self.now.day
+		
 		elif len(li) == 1:
-			return self.now.year, self.now.month, self._get_day(li[0])
+			try:
+				dt = datetime.strptime(s, '%Y-%m-%d')
+			except ValueError:
+				pass
+			else:
+				return dt.year, dt.month, dt.day
+			
+			if s in ['yesterday', 'last']:
+				day = self.now.day-1
+			elif s == 'today':
+				day = self.now.day
+			else:
+				day = self._get_day(li[0])
+			
+			return self.now.year, self.now.month, day
 		
 		elif len(li) == 2:
 			combos = self._try([self._get_month, self._get_day], li)

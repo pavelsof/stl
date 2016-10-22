@@ -67,6 +67,38 @@ class ParserTestCase(TestCase):
 		self.assertEqual(day, d.day)
 	
 	
+	@given(dates(min_year=1000))
+	def test_extract_date_iso(self, d):
+		year, month, day = self.parser.extract_date(d.isoformat())
+		self.assertEqual(year, d.year)
+		self.assertEqual(month, d.month)
+		self.assertEqual(day, d.day)
+	
+	
+	def test_extract_words(self):
+		year = self.parser.extract_year('last')
+		self.assertEqual(year, self.now.year-1)
+		
+		year, month = self.parser.extract_month('last')
+		self.assertEqual(year, self.now.year)
+		self.assertEqual(month, self.now.month-1)
+		
+		year, month, day = self.parser.extract_date('last')
+		self.assertEqual(year, self.now.year)
+		self.assertEqual(month, self.now.month)
+		self.assertEqual(day, self.now.day-1)
+		
+		year, month, day = self.parser.extract_date('yesterday')
+		self.assertEqual(year, self.now.year)
+		self.assertEqual(month, self.now.month)
+		self.assertEqual(day, self.now.day-1)
+		
+		year, month, day = self.parser.extract_date('today')
+		self.assertEqual(year, self.now.year)
+		self.assertEqual(month, self.now.month)
+		self.assertEqual(day, self.now.day)
+	
+	
 	def test_extract_empty_strings(self):
 		year = self.parser.extract_year('')
 		self.assertEqual(year, self.now.year)
