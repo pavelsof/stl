@@ -91,21 +91,15 @@ class Status:
 		])
 	
 	
-	def get_week_info(self, year, week):
+	def get_week_info(self, monday, sunday):
 		"""
 		Returns a human-readable string containing info about the work done
-		during the given week.
+		during the week defined by the given date instances.
 		"""
-		logs = []
-		dts = []
+		logs = self.db.get_span(monday, sunday)
 		
-		for weekday in [1, 2, 3, 4, 5, 6, 0]:
-			dt = datetime.strptime('{} {} {}'.format(year, week, weekday), '%Y %W %w')
-			logs.extend(self.db.get_day(dt.year, dt.month, dt.day))
-			dts.append(dt)
-		
-		pretty_monday = prettify_date(dts[0].year, dts[0].month, dts[0].day)
-		pretty_sunday = prettify_date(dts[-1].year, dts[-1].month, dts[-1].day)
+		pretty_monday = prettify_date(monday.year, monday.month, monday.day)
+		pretty_sunday = prettify_date(sunday.year, sunday.month, sunday.day)
 		
 		return '\n'.join([
 			'[{} to {}]'.format(pretty_monday, pretty_sunday),

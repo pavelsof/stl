@@ -157,6 +157,25 @@ class DatabaseTestCase(TestCase):
 			shutil.rmtree(year_dir)
 	
 	
+	@given(lists(fixed_dictionaries({  # min and max year set for gen speed
+			'start': datetimes(min_year=2000, max_year=2100, timezones=[]),
+			'stop': datetimes(min_year=2000, max_year=2100, timezones=[]),
+			'task': text()}), min_size=1))
+	def test_get_span(self, li):
+		li = list(sorted(li, key=lambda d: d['start']))
+		first = li[0]['start'].date()
+		last = li[-1]['start'].date()
+		
+		for d in li:
+			self.db.add_complete(d['start'], d['stop'], d['task'])
+		
+		span = self.db.get_span(first, last)
+		self.assertEqual(len(span), len(li))
+		
+		for subdir in os.listdir(self.temp_dir.name):
+			shutil.rmtree(os.path.join(self.temp_dir.name, subdir))
+	
+	
 	@given(dictionaries(
 			keys = text(),
 			values = lists(datetimes(timezones=[]), min_size=1)))

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from itertools import permutations
 from unittest import TestCase
 
@@ -39,6 +39,20 @@ class ParserTestCase(TestCase):
 		year, month = self.parser.extract_month(s)
 		self.assertEqual(year, self.now.year)
 		self.assertEqual(month, d.month)
+	
+	
+	def test_extract_week(self):
+		monday, sunday = self.parser.extract_week('')
+		self.assertEqual(monday, date(2016, 10, 10))
+		self.assertEqual(sunday, date(2016, 10, 16))
+		
+		monday, sunday = self.parser.extract_week('this')
+		self.assertEqual(monday, date(2016, 10, 10))
+		self.assertEqual(sunday, date(2016, 10, 16))
+		
+		monday, sunday = self.parser.extract_week('last')
+		self.assertEqual(monday, date(2016, 10, 3))
+		self.assertEqual(sunday, date(2016, 10, 9))
 	
 	
 	@given(dates(min_year=1000),

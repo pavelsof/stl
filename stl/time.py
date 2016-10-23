@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from itertools import permutations
 
 import logging
@@ -143,23 +143,28 @@ class Parser:
 	
 	def extract_week(self, s):
 		"""
-		Returns a (year, week number) tuple extracted from the given string.
+		Returns a (date1, date2) tuple with date1 being a Monday and date2
+		being a Sunday defining the week extracted from the given string.
 		Raises ValueError if unsuccessful.
 		"""
+		monday = self.now.date() - timedelta(days=self.now.weekday())
+		sunday = monday + timedelta(days=6)
+		
 		li = s.split()
 		
 		if len(li) == 0:
-			return self.now.year, self.now.isocalendar()[1]
+			return monday, sunday
 		
 		elif len(li) == 1:
 			if s.lower() == 'last':
-				week = self.now.isocalendar()[1]-1
+				monday = monday - timedelta(days=7)
+				sunday = sunday - timedelta(days=7)
 			elif s.lower() == 'this':
-				week = self.now.isocalendar()[1]
+				pass
 			else:
 				raise ValueError('Could not infer week: {}'.format(s))
 			
-			return self.now.year, week
+			return monday, sunday
 		
 		else:
 			raise ValueError('Could not infer week: {}'.format(s))

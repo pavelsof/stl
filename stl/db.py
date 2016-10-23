@@ -257,6 +257,35 @@ class Database:
 			for item in self.get_month(year, month)]
 	
 	
+	def get_span(self, start, end):
+		"""
+		Returns the [] of {start, stop, task} for the archive log entries
+		started between the points in time specified by the given date
+		instances, inclusive. The [] is sorted by the start datetime.
+		"""
+		if start.year == end.year and start.month == end.month:
+			return [log for log in self.get_month(start.year, start.month)
+				if log['start'].date() >= start and log['start'].date() <= end]
+		
+		logs = [log for log in self.get_month(start.year, start.month)
+				if log['start'].date() >= start]
+		
+		year, month = int(start.year), int(start.month)
+		while True:
+			month += 1
+			if month > 12:
+				month = 1
+				year += 1
+			if year == end.year and month == end.month:
+				break
+			logs.extend(self.get_month(year, month))
+		
+		logs.extend([log for log in self.get_month(end.year, end.month)
+					if log['start'].date() <= end])
+		
+		return logs
+	
+	
 	"""
 	Methods handling the tasks file
 	"""
