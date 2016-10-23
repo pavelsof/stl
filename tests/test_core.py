@@ -26,8 +26,10 @@ class CoreTestCase(TestCase):
 			mock_method.assert_called_once_with()
 			self.assertEqual(self.core.dir_path, self.temp_dir.name)
 	
+	
 	def tearDown(self):
 		self.temp_dir.cleanup()
+	
 	
 	def _check_dt_equal(self, dt1, dt2, seconds=False):
 		self.assertEqual(dt1.year, dt2.year)
@@ -37,6 +39,12 @@ class CoreTestCase(TestCase):
 		self.assertEqual(dt1.minute, dt2.minute)
 		if seconds:
 			self.assertEqual(dt1.second, dt2.second)
+	
+	
+	def test_init_with_bad_dir(self):
+		keine_dir = os.path.join(self.temp_dir.name, 'keine')
+		with self.assertRaises(ValueError):
+			core = Core(dir_path=keine_dir)
 	
 	
 	@given(datetimes(timezones=[]), text())

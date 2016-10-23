@@ -19,15 +19,19 @@ class Cli:
 		the argparse args as arguments, which function will be called if the
 		respective command is called.
 		"""
-		usage = 'stl [-v] subcommand'
+		usage = 'stl [-v] [--dir DIR] subcommand'
 		desc = (
 			'stl is a simple time logger that enables you to '
 			'keep tally of how many hours you have worked on this or that'
 		)
 		
 		self.parser = argparse.ArgumentParser(usage=usage, description=desc)
+		
 		self.parser.add_argument('-v', '--verbose', action='store_true',
-			help='prints debug info; if used, it must precede the other arguments')
+			help='print debug info')
+		self.parser.add_argument('--dir', help=(
+			'set the directory where the data will be saved; '
+			'defaults to ~/.config/stl or ~/.stl'))
 		
 		self.subparsers = self.parser.add_subparsers(dest='command',
 			title='subcommands')
@@ -214,7 +218,7 @@ class Cli:
 		if args.command is None:
 			return self.parser.format_help()
 		
-		core = Core(verbose=args.verbose)
+		core = Core(dir_path=args.dir, verbose=args.verbose)
 		
 		try:
 			res = args.func(core, args)

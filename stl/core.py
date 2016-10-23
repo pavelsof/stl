@@ -44,12 +44,12 @@ class Core:
 	the other modules in order to accomplish the tasks requested by the user.
 	"""
 	
-	def __init__(self, verbose=False):
+	def __init__(self, dir_path=None, verbose=False):
 		"""
 		Constructor. Configures the logging and inits the Database instance.
 		
-		The verbosity flag determines whether the min log level would be DEBUG
-		or INFO.
+		If set, dir_path has to be a valid path. The verbosity flag determines
+		whether the min log level would be DEBUG or INFO.
 		"""
 		config = dict(DEFAULT_LOGGING)
 		
@@ -60,7 +60,13 @@ class Core:
 		
 		self.log = logging.getLogger(__name__)
 		
-		self.dir_path = self._get_dir_path()
+		if dir_path:
+			self.dir_path = os.path.abspath(dir_path)
+			if not os.path.exists(self.dir_path):
+				raise ValueError('Could not find {}'.format(self.dir_path))
+		else:
+			self.dir_path = self._get_dir_path()
+		
 		self.db = Database(self.dir_path)
 	
 	
