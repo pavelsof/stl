@@ -177,8 +177,8 @@ class Core:
 		
 		parser = Parser(now)
 		if key == 'day':
-			year, month, day = parser.extract_date(value)
-			return status.get_day_info(year, month, day)
+			d = parser.extract_date(value)
+			return status.get_day_info(d)
 		elif key == 'week':
 			monday, sunday = parser.extract_week(value)
 			return status.get_week_info(monday, sunday)

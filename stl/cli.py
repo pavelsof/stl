@@ -123,7 +123,7 @@ class Cli:
 			
 			return core.status(extra=extra)
 		
-		usage = 'stl (status|show) [-d ... | -m ... | -y ... | -t ...]'
+		usage = 'stl (status|show) [-d ... | -w ... | -m ... | -y ... | -t ...]'
 		desc = (
 			'show a status report; '
 			'when called without further arguments, '
@@ -144,11 +144,11 @@ class Cli:
 			'empty string defaults to this week'))
 		group.add_argument('-m', '--month', nargs=argparse.REMAINDER, help=(
 			'report for the given month, '
-			'e.g. oct, 10, 10 2016, last; '
+			'e.g. oct, 10, 10 2016, this, last; '
 			'empty string defaults to this month'))
 		group.add_argument('-y', '--year', nargs=argparse.REMAINDER, help=(
 			'report for the given year, '
-			'e.g. 2016, last; '
+			'e.g. 2016, this, last; '
 			'empty string defaults to this year'))
 		group.add_argument('-t', '--task', nargs=argparse.REMAINDER,
 			help='report for the given task')

@@ -62,69 +62,61 @@ class ParserTestCase(TestCase):
 	def test_extract_date(self, d, y_code, m_code, d_code):
 		for perm in permutations([y_code, m_code, d_code]):
 			s = d.strftime(' '.join(perm))
-			year, month, day = self.parser.extract_date(s)
-			self.assertEqual(year, d.year)
-			self.assertEqual(month, d.month)
-			self.assertEqual(day, d.day)
+			res = self.parser.extract_date(s)
+			self.assertEqual(res.year, d.year)
+			self.assertEqual(res.month, d.month)
+			self.assertEqual(res.day, d.day)
 		
 		for perm in permutations([m_code, d_code]):
 			s = d.strftime(' '.join(perm))
-			year, month, day = self.parser.extract_date(s)
-			self.assertEqual(year, self.now.year)
-			self.assertEqual(month, d.month)
-			self.assertEqual(day, d.day)
+			res = self.parser.extract_date(s)
+			self.assertEqual(res.year, self.now.year)
+			self.assertEqual(res.month, d.month)
+			self.assertEqual(res.day, d.day)
 		
 		s = d.strftime(d_code)
-		year, month, day = self.parser.extract_date(s)
-		self.assertEqual(year, self.now.year)
-		self.assertEqual(month, self.now.month)
-		self.assertEqual(day, d.day)
+		res = self.parser.extract_date(s)
+		self.assertEqual(res.year, self.now.year)
+		self.assertEqual(res.month, self.now.month)
+		self.assertEqual(res.day, d.day)
 	
 	
 	@given(dates(min_year=1000))
 	def test_extract_date_iso(self, d):
-		year, month, day = self.parser.extract_date(d.isoformat())
-		self.assertEqual(year, d.year)
-		self.assertEqual(month, d.month)
-		self.assertEqual(day, d.day)
+		res = self.parser.extract_date(d.isoformat())
+		self.assertEqual(res.year, d.year)
+		self.assertEqual(res.month, d.month)
+		self.assertEqual(res.day, d.day)
 	
 	
-	def test_extract_words(self):
+	def test_extract_strings(self):
 		year = self.parser.extract_year('last')
 		self.assertEqual(year, self.now.year-1)
+		
+		for word in ['', 'this']:
+			year = self.parser.extract_year(word)
+			self.assertEqual(year, self.now.year)
 		
 		year, month = self.parser.extract_month('last')
 		self.assertEqual(year, self.now.year)
 		self.assertEqual(month, self.now.month-1)
 		
-		year, month, day = self.parser.extract_date('last')
-		self.assertEqual(year, self.now.year)
-		self.assertEqual(month, self.now.month)
-		self.assertEqual(day, self.now.day-1)
+		for word in ['', 'this']:
+			year, month = self.parser.extract_month(word)
+			self.assertEqual(year, self.now.year)
+			self.assertEqual(month, self.now.month)
 		
-		year, month, day = self.parser.extract_date('yesterday')
-		self.assertEqual(year, self.now.year)
-		self.assertEqual(month, self.now.month)
-		self.assertEqual(day, self.now.day-1)
+		for word in ['last', 'yesterday']:
+			res = self.parser.extract_date(word)
+			self.assertEqual(res.year, self.now.year)
+			self.assertEqual(res.month, self.now.month)
+			self.assertEqual(res.day, self.now.day-1)
 		
-		year, month, day = self.parser.extract_date('today')
-		self.assertEqual(year, self.now.year)
-		self.assertEqual(month, self.now.month)
-		self.assertEqual(day, self.now.day)
-	
-	
-	def test_extract_empty_strings(self):
-		year = self.parser.extract_year('')
-		self.assertEqual(year, self.now.year)
-		
-		year, month = self.parser.extract_month('')
-		self.assertEqual(year, self.now.year)
-		self.assertEqual(month, self.now.month)
-		
-		year, month, day = self.parser.extract_date('')
-		self.assertEqual(year, self.now.year)
-		self.assertEqual(month, self.now.month)
-		self.assertEqual(day, self.now.day)
+		for word in ['', 'this', 'today']:
+			res = self.parser.extract_date(word)
+			self.assertEqual(res.year, self.now.year)
+			self.assertEqual(res.month, self.now.month)
+			self.assertEqual(res.day, self.now.day)
 	
 	
 	@given(datetimes(timezones=[]))
@@ -146,10 +138,10 @@ class PrettifyTestCase(TestCase):
 	@given(dates(min_year=1000))
 	def test_prettify_date(self, d):
 		s = prettify_date(d.year, d.month, d.day)
-		year, month, day = self.parser.extract_date(s)
-		self.assertEqual(year, d.year)
-		self.assertEqual(month, d.month)
-		self.assertEqual(day, d.day)
+		res = self.parser.extract_date(s)
+		self.assertEqual(res.year, d.year)
+		self.assertEqual(res.month, d.month)
+		self.assertEqual(res.day, d.day)
 		
 		s = prettify_date(d.year, d.month)
 		year, month = self.parser.extract_month(s)
@@ -162,10 +154,10 @@ class PrettifyTestCase(TestCase):
 		s = prettify_datetime(dt)
 		parts = s.rsplit(maxsplit=1)
 		
-		year, month, day = self.parser.extract_date(parts[0])
-		self.assertEqual(year, dt.year)
-		self.assertEqual(month, dt.month)
-		self.assertEqual(day, dt.day)
+		res = self.parser.extract_date(parts[0])
+		self.assertEqual(res.year, dt.year)
+		self.assertEqual(res.month, dt.month)
+		self.assertEqual(res.day, dt.day)
 		
 		hour, minute = map(int, parts[1].split(':'))
 		self.assertEqual(hour, dt.hour)

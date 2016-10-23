@@ -131,7 +131,8 @@ class Database:
 		if create and not os.path.exists(year_dir):
 			try:
 				os.mkdir(year_dir)
-			except:
+			except Exception as err:
+				self.log.error(str(err))
 				raise DatabaseError('Could not create database subdir')
 			else:
 				self.log.debug('Created dir '+year_dir)

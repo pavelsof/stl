@@ -103,7 +103,7 @@ class Parser:
 		Returns the year extracted from the given string. Raises ValueError if
 		unsuccessful.
 		"""
-		if not len(s):
+		if not len(s) or s.lower() == 'this':
 			return self.now.year
 		
 		if s.lower() == 'last':
@@ -125,6 +125,8 @@ class Parser:
 		elif len(li) == 1:
 			if s.lower() == 'last':
 				month = self.now.month-1
+			elif s.lower() == 'this':
+				month = self.now.month
 			else:
 				month = self._get_month(s)
 			
@@ -172,8 +174,8 @@ class Parser:
 	
 	def extract_date(self, s):
 		"""
-		Returns a (year, month, day) tuple extracted from the given string.
-		Raises ValueError if unsuccessful.
+		Returns a date instance extracted from the given string. Raises
+		ValueError if unsuccessful.
 		
 		Apart from the _get_(year|month|day) permutations, this method also
 		recognises the ISO date format and words like today and yesterday.
@@ -181,7 +183,7 @@ class Parser:
 		li = s.split()
 		
 		if len(li) == 0:
-			return self.now.year, self.now.month, self.now.day
+			return self.now.date()
 		
 		elif len(li) == 1:
 			try:
@@ -189,30 +191,30 @@ class Parser:
 			except ValueError:
 				pass
 			else:
-				return dt.year, dt.month, dt.day
+				return dt.date()
 			
-			if s.lower() in ['yesterday', 'last']:
+			if s.lower() in ['last', 'yesterday']:
 				day = self.now.day-1
-			elif s.lower() == 'today':
+			elif s.lower() in ['this', 'today']:
 				day = self.now.day
 			else:
 				day = self._get_day(li[0])
 			
-			return self.now.year, self.now.month, day
+			return date(self.now.year, self.now.month, day)
 		
 		elif len(li) == 2:
 			combos = self._try([self._get_month, self._get_day], li)
 			if len(combos) != 1:
 				raise ValueError('Could not infer date: {}'.format(s))
 			
-			return self.now.year, combos[0][0], combos[0][1]
+			return date(self.now.year, combos[0][0], combos[0][1])
 		
 		elif len(li) == 3:
 			combos = self._try([self._get_year, self._get_month, self._get_day], li)
 			if len(combos) != 1:
 				raise ValueError('Could not infer date: {}'.format(s))
 			
-			return combos[0][0], combos[0][1], combos[0][2]
+			return date(combos[0][0], combos[0][1], combos[0][2])
 		
 		else:
 			raise ValueError('Could not infer date: {}'.format(s))

@@ -79,14 +79,14 @@ class Status:
 		])
 	
 	
-	def get_day_info(self, year, month, day):
+	def get_day_info(self, d):
 		"""
 		Returns a human-readable string containing info about the work done
-		during the given day.
+		during the given day. The latter is expected to be a date instance.
 		"""
-		logs = self.db.get_day(year, month, day)
+		logs = self.db.get_day(d.year, d.month, d.day)
 		return '\n'.join([
-			'[{}]'.format(prettify_date(year, month, day)),
+			'[{}]'.format(prettify_date(d.year, d.month, d.day)),
 			self._get_time_info(logs)
 		])
 	

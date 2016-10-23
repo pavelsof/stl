@@ -21,8 +21,10 @@ class DatabaseTestCase(TestCase):
 		self.temp_dir = TemporaryDirectory()
 		self.db = Database(self.temp_dir.name)
 	
+	
 	def tearDown(self):
 		self.temp_dir.cleanup()
+	
 	
 	def _check_dt_equal(self, dt1, dt2, seconds=False):
 		self.assertEqual(dt1.year, dt2.year)
