@@ -44,7 +44,7 @@ class CoreTestCase(TestCase):
 	def test_init_with_bad_dir(self):
 		keine_dir = os.path.join(self.temp_dir.name, 'keine')
 		with self.assertRaises(ValueError):
-			core = Core(dir_path=keine_dir)
+			Core(dir_path=keine_dir)
 	
 	
 	@given(datetimes(timezones=[]), text())

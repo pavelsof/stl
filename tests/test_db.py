@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import os
 import shutil
 
@@ -11,7 +9,7 @@ from hypothesis.strategies import dictionaries, fixed_dictionaries
 from hypothesis.strategies import lists, text
 from hypothesis import given
 
-from stl.db import DatabaseError, Database
+from stl.db import Database
 
 
 

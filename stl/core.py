@@ -8,7 +8,7 @@ from stl.db import Database
 from stl.spawn import Spawner
 from stl.status import Status
 from stl.time import Parser
-from stl.time import prettify_date, prettify_datetime, prettify_delta
+from stl.time import prettify_date, prettify_datetime
 
 
 

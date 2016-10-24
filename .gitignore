@@ -1,5 +1,7 @@
 meta/*
-stl.egg-info/*
+
+*.egg-info/*
+*.eggs/*
 
 .coverage
 .hypothesis/*

@@ -13,21 +13,21 @@ with open(os.path.join(BASE_DIR, 'README.md')) as f:
 
 
 setup(
-	name = 'stl',
-	version = '2016.10',
+	name = 'stltimelogger',
+	version = '0.0',
 	
 	description = 'Yet another cli time logger',
 	long_description = README,
 	
 	url = 'https://github.com/pavelsof/stl',
 	
-	author = 'pavelsof',
+	author = 'Pavel Sofroniev',
 	author_email = 'pavelsof@gmail.com',
 	
 	license = 'MIT',
 	
 	classifiers = [
-		'Development Status :: 3 - Alpha',
+		'Development Status :: 4 - Beta',
 		'Environment :: Console',
 		'Intended Audience :: Developers',
 		'License :: OSI Approved :: MIT License',
@@ -38,6 +38,9 @@ setup(
 	
 	packages = find_packages(),
 	install_requires = [],
+	
+	test_suite = 'tests',
+	tests_require = ['pytz', 'hypothesis >= 3.5'],
 	
 	entry_points = {
 		'console_scripts': [
