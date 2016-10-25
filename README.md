@@ -1,7 +1,7 @@
 # stl: time logger
 
-Yet another cli time logger. Diligently make logs when you switch on/off the
-working mode and it will dutifully do the arithmetics.
+A cli time logger. Diligently make logs when you switch on/off the working mode
+and it will dutifully do the arithmetics.
 
 
 ## usage
@@ -29,7 +29,7 @@ stl show --span 15 oct 5 dec
 
 Check `stl show --help` for all the options, there are a few of these. The data
 is stored in plaintext files in `~/.config/stl`, safe to move around or version
-control them.
+control.
 
 
 ## installation

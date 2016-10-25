@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 from itertools import permutations
-from unittest import TestCase, skip
+from unittest import TestCase
 
 from hypothesis.extra.datetime import dates, datetimes
 from hypothesis.strategies import just, sampled_from
