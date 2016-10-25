@@ -1,10 +1,10 @@
 from datetime import date, datetime, timedelta
 from itertools import permutations
-from unittest import TestCase
+from unittest import TestCase, skip
 
 from hypothesis.extra.datetime import dates, datetimes
 from hypothesis.strategies import just, sampled_from
-from hypothesis import given
+from hypothesis import assume, given
 
 from stl.time import Parser
 from stl.time import prettify_date, prettify_datetime, prettify_delta
@@ -125,6 +125,64 @@ class ParserTestCase(TestCase):
 		
 		for prop in ['year', 'month', 'day', 'hour', 'minute']:
 			self.assertEqual(getattr(res, prop), getattr(dt, prop))
+	
+	
+	def test_extract_span_errors(self):
+		with self.assertRaises(ValueError):
+			self.parser.extract_span('')
+		
+		with self.assertRaises(ValueError):
+			self.parser.extract_span('10 sep sep')
+		
+		with self.assertRaises(ValueError):
+			self.parser.extract_span('10 2016 sep sep')
+		
+		with self.assertRaises(ValueError):
+			self.parser.extract_span('sep 2016')
+	
+	
+	def test_extract_span(self):
+		d1, d2 = self.parser.extract_span('10')
+		self.assertEqual(d1, date(2016, 10, 10))
+		self.assertEqual(d2, date(2016, 10, 15))
+		
+		d1, d2 = self.parser.extract_span('10 12')
+		self.assertEqual(d1, date(2016, 10, 10))
+		self.assertEqual(d2, date(2016, 10, 12))
+		
+		d1, d2 = self.parser.extract_span('10 12 sep')
+		self.assertEqual(d1, date(2016, 9, 10))
+		self.assertEqual(d2, date(2016, 9, 12))
+		
+		d1, d2 = self.parser.extract_span('10 sep 12 oct')
+		self.assertEqual(d1, date(2016, 9, 10))
+		self.assertEqual(d2, date(2016, 10, 12))
+		
+		d1, d2 = self.parser.extract_span('10 sep 12 oct 2015')
+		self.assertEqual(d1, date(2015, 9, 10))
+		self.assertEqual(d2, date(2015, 10, 12))
+		
+		d1, d2 = self.parser.extract_span('10 sep 2014 12 oct 2015')
+		self.assertEqual(d1, date(2014, 9, 10))
+		self.assertEqual(d2, date(2015, 10, 12))
+		
+		'''d1, d2 = self.parser.extract_span('2014-09-10 2015-10-12')
+		self.assertEqual(d1, date(2014, 9, 10))
+		self.assertEqual(d2, date(2015, 10, 12))'''
+	
+	
+	@given(dates(min_year=1000, max_year=2015))
+	def test_extract_span_one_date(self, d):
+		assume(d < self.now.date())
+		
+		for perm in permutations(['%Y', '%b', '%d']):
+			d1, d2 = self.parser.extract_span(d.strftime(' '.join(perm)))
+			self.assertEqual(d1, d)
+			self.assertEqual(d2, self.now.date())
+		
+		'''d1, d2 = self.parser.extract_span(d.isoformat())
+		self.assertEqual(d1, d)
+		self.assertEqual(d2, self.now.date())'''
 
 
 

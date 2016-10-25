@@ -64,6 +64,8 @@ dependencies.
 
 * [timeflow](https://github.com/trimailov/timeflow): also python but somewhat
   different approach.
+* [taskwarrior](https://taskwarrior.org/): a great todo cli manager which
+  includes time logging functionality as well.
 
 
 ## licence

@@ -232,6 +232,100 @@ class Parser:
 			raise ValueError('Could not infer datetime: {}'.format(s))
 		
 		return dt
+	
+	
+	def _extract_span(self, tokens):
+		"""
+		Helper for the extract_span method. Parses the already tokenised input
+		string and returns two date instances. This method does not try to
+		catch any exceptions: this is done by extract_span.
+		"""
+		tags = []
+		for token in tokens:
+			if token.isdigit():
+				if len(token) == 4: tags.append('y')
+				else: tags.append('d')
+			else: tags.append('m')
+		
+		if set(tags[-3:]) == set(['d', 'm', 'y']):
+			assert len(tokens) in [3, 4, 5, 6]
+			
+			d2 = date(self._get_year(tokens[-3:][tags[-3:].index('y')]),
+					self._get_month(tokens[-3:][tags[-3:].index('m')]),
+					self._get_day(tokens[-3:][tags[-3:].index('d')]))
+			
+			if len(tokens) == 6:
+				assert set(tags[:3]) == set(['d', 'm', 'y'])
+				d1 = date(self._get_year(tokens[tags[:3].index('y')]),
+						self._get_month(tokens[tags[:3].index('m')]),
+						self._get_day(tokens[tags[:3].index('d')]))
+			elif len(tokens) == 5:
+				assert set(tags[:2]) == set(['d', 'm'])
+				d1 = date(d2.year,
+						self._get_month(tokens[tags[:2].index('m')]),
+						self._get_day(tokens[tags[:2].index('d')]))
+			elif len(tokens) == 4:
+				assert tags[0] == 'd'
+				d1 = date(d2.year, d2.month)
+			elif len(tokens) == 3:
+				d1 = self.now.date()
+		
+		elif set(tags[-2:]) == set(['d', 'm']):
+			assert len(tokens) in [2, 3, 4]
+			
+			d2 = date(self.now.year,
+					self._get_month(tokens[-2:][tags[-2:].index('m')]),
+					self._get_day(tokens[-2:][tags[-2:].index('d')]))
+			
+			if len(tokens) == 4:
+				assert set(tags[:2]) == set(['d', 'm'])
+				d1 = date(d2.year,
+						self._get_month(tokens[tags[:2].index('m')]),
+						self._get_day(tokens[tags[:2].index('d')]))
+			elif len(tokens) == 3:
+				assert tags[0] == 'd'
+				d1 = date(d2.year, d2.month, self._get_day(tokens[0]))
+			elif len(tokens) == 2:
+				d1 = self.now.date()
+		
+		elif tags[-1] == 'd':
+			assert len(tokens) in [1, 2]
+			
+			d2 = date(self.now.year, self.now.month, self._get_day(tokens[-1]))
+			
+			if len(tokens) == 2:
+				assert tags[0] == 'd'
+				d1 = date(d2.year, d2.month, self._get_day(tokens[0]))
+			elif len(tokens) == 1:
+				d1 = self.now.date()
+		
+		else:
+			raise ValueError
+		
+		return d1, d2
+	
+	
+	def extract_span(self, s):
+		"""
+		Returns a (d1, d2) tuple of date instances extracted from the given
+		string. The earlier date will be first even if it was not first in the
+		string.
+		"""
+		tokens = s.split()
+		
+		if len(tokens) < 1 or len(tokens) > 6:
+			raise ValueError('Could not infer dates: {}'.format(s))
+		
+		try:
+			d1, d2 = self._extract_span(tokens)
+		except (AssertionError, ValueError) as err:
+			self.log.debug(str(err))
+			raise ValueError('Could not infer dates: {}'.format(s))
+		
+		if d2 < d1:
+			d1, d2 = d2, d1
+		
+		return d1, d2
 
 
 
