@@ -116,14 +116,17 @@ class Cli:
 		def status(core, args):
 			extra = None
 			
-			for key in ['day', 'week', 'month', 'year', 'task']:
+			for key in ['day', 'week', 'month', 'year', 'span', 'task']:
 				if getattr(args, key) is not None:
 					extra = (key, ' '.join(getattr(args, key)))
 					break
 			
 			return core.status(extra=extra)
 		
-		usage = 'stl (status|show) [-d ... | -w ... | -m ... | -y ... | -t ...]'
+		usage = (
+			'stl (status|show) '
+			'[-d ... | -w ... | -m ... | -y ... | -s ... | -t ...]'
+		)
 		desc = (
 			'show a status report; '
 			'when called without further arguments, '
@@ -150,6 +153,10 @@ class Cli:
 			'report for the given year, '
 			'e.g. 2016, this, last; '
 			'empty string defaults to this year'))
+		group.add_argument('-s', '--span', nargs=argparse.REMAINDER, help=(
+			'report for the time span between two dates (inclusive), '
+			'e.g. 15 25 oct, 15 sep 2016 25 oct 2016, 15 sep 25 oct; '
+			'do not use month numbers and it should work'))
 		group.add_argument('-t', '--task', nargs=argparse.REMAINDER,
 			help='report for the given task')
 		

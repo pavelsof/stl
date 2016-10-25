@@ -91,22 +91,6 @@ class Status:
 		])
 	
 	
-	def get_week_info(self, monday, sunday):
-		"""
-		Returns a human-readable string containing info about the work done
-		during the week defined by the given date instances.
-		"""
-		logs = self.db.get_span(monday, sunday)
-		
-		pretty_monday = prettify_date(monday.year, monday.month, monday.day)
-		pretty_sunday = prettify_date(sunday.year, sunday.month, sunday.day)
-		
-		return '\n'.join([
-			'[{} to {}]'.format(pretty_monday, pretty_sunday),
-			self._get_time_info(logs)
-		])
-	
-	
 	def get_month_info(self, year, month):
 		"""
 		Returns a human-readable string containing info about the work done
@@ -127,6 +111,22 @@ class Status:
 		logs = self.db.get_year(year)
 		return '\n'.join([
 			'[{}]'.format(year),
+			self._get_time_info(logs)
+		])
+	
+	
+	def get_span_info(self, d1, d2):
+		"""
+		Returns a human-readable string containing info about the work done
+		between the two given dates, inclusive.
+		"""
+		logs = self.db.get_span(d1, d2)
+		
+		pretty_d1 = prettify_date(d1.year, d1.month, d1.day)
+		pretty_d2 = prettify_date(d2.year, d2.month, d2.day)
+		
+		return '\n'.join([
+			'[{} to {}]'.format(pretty_d1, pretty_d2),
 			self._get_time_info(logs)
 		])
 	

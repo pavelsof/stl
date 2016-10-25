@@ -181,13 +181,16 @@ class Core:
 			return status.get_day_info(d)
 		elif key == 'week':
 			monday, sunday = parser.extract_week(value)
-			return status.get_week_info(monday, sunday)
+			return status.get_span_info(monday, sunday)
 		elif key == 'month':
 			year, month = parser.extract_month(value)
 			return status.get_month_info(year, month)
 		elif key == 'year':
 			year = parser.extract_year(value)
 			return status.get_year_info(year)
+		elif key == 'span':
+			d1, d2 = parser.extract_span(value)
+			return status.get_span_info(d1, d2)
 	
 	
 	def add(self, start, stop, task=''):
