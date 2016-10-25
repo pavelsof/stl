@@ -24,6 +24,7 @@ your working hours curiousity:
 ```bash
 stl show --task lumberjacking
 stl show --month october
+stl show --span 15 oct 5 dec
 ```
 
 Check `stl show --help` for all the options, there are a few of these. The data
@@ -51,6 +52,10 @@ dependencies.
 	  oct, oct 2016, 2016 oct, october, 10, this, last.
 	* `stl show --year YEAR` (also `-y`) where YEAR can be anything like: 2016,
 	  16, this, last.
+	* `stl show --span SPAN` (also `-s`) where SPAN can be anything like: 15 25
+	  oct, 15 oct 2016 25 oct 2016, 15 25, 15. If you specify only one date, the
+	  second will be set to today; e.g. `stl show -s 1 oct` is the same as `stl
+	  show -m oct`. The interval is inclusive at both ends.
 	* `stl show --task TASK` (also `-t`) where TASK is the name of a task you
 	  have prudently specified when you had been working on it.
 * `stl add START STOP [TASK]` allows you to cheat and add log entries for
@@ -62,7 +67,7 @@ dependencies.
 
 ## similar projects
 
-* [timeflow](https://github.com/trimailov/timeflow): also python but somewhat
+* [timeflow](https://github.com/trimailov/timeflow): also in Python but somewhat
   different approach.
 * [taskwarrior](https://taskwarrior.org/): a great todo cli manager which
   includes time logging functionality as well.

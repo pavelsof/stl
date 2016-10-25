@@ -156,7 +156,10 @@ class Cli:
 		group.add_argument('-s', '--span', nargs=argparse.REMAINDER, help=(
 			'report for the time span between two dates (inclusive), '
 			'e.g. 15 25 oct, 15 sep 2016 25 oct 2016, 15 sep 25 oct; '
-			'do not use month numbers and it should work'))
+			'if you specify only one date, the second will be set to today; '
+			'some restrictions: '
+			'the second date (if such) cannot be less specific than the first '
+			'and months cannot be numbers'))
 		group.add_argument('-t', '--task', nargs=argparse.REMAINDER,
 			help='report for the given task')
 		
