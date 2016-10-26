@@ -1,10 +1,12 @@
+build/*
+dist/*
 meta/*
+stltimelogger.egg-info/*
 
-*.egg-info/*
-*.eggs/*
+.eggs/*
+.hypothesis/*
 
 .coverage
-.hypothesis/*
 
 *.pyc
 *.swp

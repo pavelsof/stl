@@ -14,9 +14,9 @@ with open(os.path.join(BASE_DIR, 'README.md')) as f:
 
 setup(
 	name = 'stltimelogger',
-	version = '0.0',
+	version = '0.0.1',
 	
-	description = 'Yet another cli time logger',
+	description = 'cli time logger',
 	long_description = README,
 	
 	url = 'https://github.com/pavelsof/stl',
@@ -36,7 +36,7 @@ setup(
 	],
 	keywords = 'cli time logger',
 	
-	packages = find_packages(),
+	packages = find_packages(exclude=['tests/*']),
 	install_requires = [],
 	
 	test_suite = 'tests',
