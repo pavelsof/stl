@@ -7,14 +7,14 @@ from setuptools import setup, find_packages
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-with open(os.path.join(BASE_DIR, 'README.md')) as f:
+with open(os.path.join(BASE_DIR, 'README.rst')) as f:
 	README = f.read()
 
 
 
 setup(
 	name = 'stltimelogger',
-	version = '0.0.1',
+	version = '0.0.2',
 	
 	description = 'cli time logger',
 	long_description = README,
@@ -36,10 +36,10 @@ setup(
 	],
 	keywords = 'cli time logger',
 	
-	packages = find_packages(exclude=['tests/*']),
+	packages = find_packages(),
 	install_requires = [],
 	
-	test_suite = 'tests',
+	test_suite = 'stl.tests',
 	tests_require = ['pytz', 'hypothesis >= 3.5'],
 	
 	entry_points = {
