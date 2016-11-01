@@ -14,7 +14,7 @@ with open(os.path.join(BASE_DIR, 'README.rst')) as f:
 
 setup(
 	name = 'stltimelogger',
-	version = '0.0.2',
+	version = '0.0.3',
 	
 	description = 'cli time logger',
 	long_description = README,
