@@ -293,7 +293,7 @@ class Database:
 	def _read_tasks_file(self, path):
 		"""
 		Returns a [] of the csv-read lines of the given tasks file. Helper used
-		by both add_task and get_task.
+		by add_task, get_task, and check_month_tasks.
 		"""
 		lines = []
 		
@@ -377,6 +377,39 @@ class Database:
 			li.append(item)
 		
 		return li
+	
+	
+	def check_month_tasks(self, year, month):
+		"""
+		Ensures that the tasks file contains the given month for all the tasks
+		that are worked on during that month.
+		
+		Does not ensure (yet) that the tasks file does not include a task
+		pointing to the given month which task is not in the given month's
+		archive file.
+		"""
+		s = '{}-{:02}'.format(year, month)
+		
+		tasks = [item['task']
+				for item in self.get_month(year, month) if item['task']]
+		
+		lines = self._read_tasks_file(os.path.join(self.dir_path, 'tasks'))
+		
+		mods = []
+		
+		for task in tasks:
+			try:
+				line = [line for line in lines if line[0] == task][0][1]
+			except IndexError:
+				continue
+			
+			if line.find(s) < 0:
+				mods.append(task)
+		
+		for mod in mods:
+			self.add_task(mod, year, month)
+		
+		self.log.debug('Checked tasks for {}'.format(s))
 
 
 

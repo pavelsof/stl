@@ -4,11 +4,12 @@ import shutil
 from tempfile import TemporaryDirectory
 from unittest import TestCase
 
-from hypothesis.extra.datetime import datetimes
+from hypothesis.extra.datetime import dates, datetimes
 from hypothesis.strategies import dictionaries, fixed_dictionaries
 from hypothesis.strategies import lists, text
-from hypothesis import given
+from hypothesis import assume, given
 
+from stl.db import ARCHIVE_DT_FORMAT
 from stl.db import Database
 
 
@@ -86,6 +87,9 @@ class DatabaseTestCase(TestCase):
 			'stop': datetimes(min_year=2000, max_year=2000, timezones=[]),
 			'task': text()})))
 	def test_add_complete_with_sort(self, li):
+		assume(len(li) == len(set([  # avoid dts that can be sorted either way
+			d['start'].strftime(ARCHIVE_DT_FORMAT) for d in li])))
+		
 		for d in li:
 			self.db.add_complete(d['start'], d['stop'], d['task'], append=False)
 		
@@ -178,7 +182,7 @@ class DatabaseTestCase(TestCase):
 	
 	@given(dictionaries(
 			keys = text(),
-			values = lists(datetimes(timezones=[]), min_size=1)))
+			values = lists(dates(), min_size=1)))
 	def test_add_and_get_task(self, d):
 		d = {task: dts for task, dts in d.items()
 				if self.db._sanitise_text(task)}
@@ -188,9 +192,9 @@ class DatabaseTestCase(TestCase):
 				self.db.add_task(task, dt.year, dt.month)
 		
 		for task, dts in d.items():
+			li = list(set([(dt.year, dt.month) for dt in dts]))
 			res = self.db.get_task(task)
-			for dt in dts:
-				self.assertIn((dt.year, dt.month), res)
+			self.assertEqual(list(sorted(li)), list(sorted(res)))
 		
 		path = os.path.join(self.temp_dir.name, 'tasks')
 		if os.path.exists(path):
