@@ -32,47 +32,58 @@ version control.
 installation
 ============
 
-This is a standard Python 3 package installable through pip and without
-dependencies::
+This is a standard Python 3 package without dependencies. You can install it
+through pip::
 
     pip install stltimelogger
+
+or, alternatively, you can clone this repo (safe to delete afterwards) and do::
+
+    python setup.py test
+    python setup.py install
+
+To uninstall::
+
+    pip uninstall stltimelogger
+    rm -r ~/.config/stl
+
+Of course, all of that could be happening within a virtualenv/venv.
 
 
 docs
 ====
 
-* ``stl start`` makes a log that you start working. You can also add a task
-  name if you want to see stats about that particular task later on.
+``stl start`` makes a log that you start working. You can also add a task name
+if you want to see stats about that particular task later on.
 
-* ``stl stop`` makes a log that you have stopped working.
+``stl stop`` makes a log that you have stopped working.
 
-* ``stl show`` (also ``stl status``) shows you how far you are into your
-  current task when called without additional arguments. The latter might be:
+``stl show`` (also ``stl status``) shows you how far you are into your current
+task when called without additional arguments. The latter might be:
 
-    * ``stl show --day DAY`` (also ``-d``) where ``DAY`` can be anything like:
-      ``15 oct 2016``, ``october 15``, ``15``, ``2016-10-15``, ``today``,
-      ``yesterday``, ``this``, ``last``.
-    * ``stl show --week WEEK`` (also ``-w``) where ``WEEK`` can be either
-      ``this`` or ``last``.
-    * ``stl show --month MONTH`` (also ``-m``) where ``MONTH`` can be anything
-      like: ``oct``, ``oct 2016``, ``2016 oct``, ``october``, ``10``, ``this``,
-      ``last``.
-    * ``stl show --year YEAR`` (also ``-y``) where ``YEAR`` can be anything
-      like: ``2016``, ``16``, ``this``, ``last``.
-    * ``stl show --span SPAN`` (also ``-s``) where ``SPAN`` can be anything
-      like: ``15 25 oct``, ``15 oct 2016 25 oct 2016``, ``15 25``, ``15``. If
-      you specify only one date, the second will be set to today; e.g. ``stl
-      show -s 1 oct`` is the same as ``stl show -m oct``. The interval is
-      inclusive at both ends.
-    * ``stl show --task TASK`` (also ``-t``) where ``TASK`` is the name of a
-      task you have prudently specified when you had been working on it.
+* ``stl show --day DAY`` (also ``-d``) where ``DAY`` can be anything like: ``15
+  oct 2016``, ``october 15``, ``15``, ``2016-10-15``, ``today``, ``yesterday``,
+  ``this``, ``last``.
+* ``stl show --week WEEK`` (also ``-w``) where ``WEEK`` can be either ``this``
+  or ``last``.
+* ``stl show --month MONTH`` (also ``-m``) where ``MONTH`` can be anything
+  like: ``oct``, ``oct 2016``, ``2016 oct``, ``october``, ``10``, ``this``,
+  ``last``.
+* ``stl show --year YEAR`` (also ``-y``) where ``YEAR`` can be anything like:
+  ``2016``, ``16``, ``this``, ``last``.
+* ``stl show --span SPAN`` (also ``-s``) where ``SPAN`` can be anything like:
+  ``15 25 oct``, ``15 oct 2016 25 oct 2016``, ``15 25``, ``15``. If you specify
+  only one date, the second will be set to today; e.g. ``stl show -s 1 oct`` is
+  the same as ``stl show -m oct``. The interval is inclusive at both ends.
+* ``stl show --task TASK`` (also ``-t``) where ``TASK`` is the name of a task
+  you have prudently specified when you had been working on it.
 
-* ``stl add START STOP [TASK]`` allows you to cheat and add log entries for
-  arbitrary time intervals in the past and future.
+``stl add START STOP [TASK]`` allows you to cheat and add log entries for
+arbitrary time intervals in the past and future.
 
-* ``stl edit WHAT`` opens the right file in your $EDITOR. ``WHAT`` can be anything
-  which is a valid ``stl show -m`` argument. As you might guess, logs are
-  stored in month files.
+``stl edit WHAT`` opens the right file in your $EDITOR. ``WHAT`` can be
+anything which is a valid ``stl show -m`` argument. As you might guess, logs
+are stored in month files.
 
 
 similar projects
