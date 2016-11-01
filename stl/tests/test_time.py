@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from hypothesis.extra.datetime import dates, datetimes
 from hypothesis.strategies import just, sampled_from
-from hypothesis import assume, given
+from hypothesis import assume, example, given
 
 from stl.time import Parser
 from stl.time import prettify_date, prettify_datetime, prettify_delta
@@ -89,7 +89,7 @@ class ParserTestCase(TestCase):
 		self.assertEqual(res.day, d.day)
 	
 	
-	def test_extract_strings(self):
+	def test_extract_words(self):
 		year = self.parser.extract_year('last')
 		self.assertEqual(year, self.now.year-1)
 		
@@ -117,6 +117,22 @@ class ParserTestCase(TestCase):
 			self.assertEqual(res.year, self.now.year)
 			self.assertEqual(res.month, self.now.month)
 			self.assertEqual(res.day, self.now.day)
+	
+	
+	@given(datetimes(min_year=1000, timezones=[]))
+	@example(datetime(2016, 10, 1))
+	def test_extract_date_words(self, dt):
+		parser = Parser(dt)
+		today = dt.date()
+		yesterday = dt.date() - timedelta(days=1)
+		
+		for word in ['last', 'yesterday']:
+			res = parser.extract_date(word)
+			self.assertEqual(res, yesterday)
+		
+		for word in ['', 'this', 'today']:
+			res = parser.extract_date(word)
+			self.assertEqual(res, today)
 	
 	
 	@given(datetimes(timezones=[]))

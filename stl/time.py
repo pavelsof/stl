@@ -194,13 +194,12 @@ class Parser:
 				return dt.date()
 			
 			if s.lower() in ['last', 'yesterday']:
-				day = self.now.day-1
+				return self.now.date() - timedelta(days=1)
 			elif s.lower() in ['this', 'today']:
-				day = self.now.day
+				return self.now.date()
 			else:
 				day = self._get_day(li[0])
-			
-			return date(self.now.year, self.now.month, day)
+				return date(self.now.year, self.now.month, day)
 		
 		elif len(li) == 2:
 			combos = self._try([self._get_month, self._get_day], li)
