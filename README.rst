@@ -35,16 +35,16 @@ installation
 This is a standard Python 3 package without dependencies. You can install it
 through pip::
 
-    pip install stltimelogger
+    pip3 install stltimelogger
 
 or, alternatively, you can clone this repo (safe to delete afterwards) and do::
 
-    python setup.py test
-    python setup.py install
+    python3 setup.py test
+    python3 setup.py install
 
 To uninstall::
 
-    pip uninstall stltimelogger
+    pip3 uninstall stltimelogger
     rm -r ~/.config/stl
 
 Of course, all of that could be happening within a virtualenv/venv.

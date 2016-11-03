@@ -21,7 +21,7 @@ ARCHIVE_DT_FORMAT_LEN = 16
 
 class DatabaseError(ValueError):
 	"""
-	Raised when writing or retrieving data fails.
+	Raised when writing or retrieving data files.
 	"""
 	pass
 
