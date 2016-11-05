@@ -2,6 +2,8 @@ import os.path
 
 from setuptools import setup, find_packages
 
+from stl import __version__
+
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -14,7 +16,7 @@ with open(os.path.join(BASE_DIR, 'README.rst')) as f:
 
 setup(
 	name = 'stltimelogger',
-	version = '0.0.3',
+	version = __version__,
 	
 	description = 'cli time logger',
 	long_description = README,

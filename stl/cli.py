@@ -1,6 +1,7 @@
 import argparse
 
 from stl.core import Core
+from stl import __version__
 
 
 
@@ -27,6 +28,7 @@ class Cli:
 		
 		self.parser = argparse.ArgumentParser(usage=usage, description=desc)
 		
+		self.parser.add_argument('--version', action='version', version=__version__)
 		self.parser.add_argument('-v', '--verbose', action='store_true',
 			help='print debug info')
 		self.parser.add_argument('--dir', help=(
