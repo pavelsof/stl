@@ -107,7 +107,7 @@ class Parser:
 			return self.now.year
 		
 		if s.lower() == 'last':
-			return self.now.year-1
+			return self.now.year - 1
 		
 		return self._get_year(s)
 	
@@ -124,13 +124,16 @@ class Parser:
 		
 		elif len(li) == 1:
 			if s.lower() == 'last':
-				month = self.now.month-1
+				month = self.now.month - 1 or 12
+				year = self.now.year - 1 if month == 12 else self.now.year
 			elif s.lower() == 'this':
 				month = self.now.month
+				year = self.now.year
 			else:
 				month = self._get_month(s)
+				year = self.now.year
 			
-			return self.now.year, month
+			return year, month
 		
 		elif len(li) == 2:
 			combos = self._try([self._get_year, self._get_month], li)
@@ -383,6 +386,3 @@ def prettify_delta(delta):
 	if not s: s = '-'
 	
 	return s
-
-
-

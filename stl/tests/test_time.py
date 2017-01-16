@@ -120,6 +120,25 @@ class ParserTestCase(TestCase):
 	
 	
 	@given(datetimes(min_year=1000, timezones=[]))
+	@example(datetime(2017, 1, 1))
+	def test_extract_month_words(self, dt):
+		parser = Parser(dt)
+		
+		last_month = dt.month - 1 or 12
+		last_month_year = dt.year - 1 if last_month == 12 else dt.year
+		
+		for word in ['last']:
+			year, month = parser.extract_month(word)
+			self.assertEqual(year, last_month_year)
+			self.assertEqual(month, last_month)
+		
+		for word in ['', 'this']:
+			year, month = parser.extract_month(word)
+			self.assertEqual(year, dt.year)
+			self.assertEqual(month, dt.month)
+	
+	
+	@given(datetimes(min_year=1000, timezones=[]))
 	@example(datetime(2016, 10, 1))
 	def test_extract_date_words(self, dt):
 		parser = Parser(dt)
@@ -250,6 +269,3 @@ class PrettifyTestCase(TestCase):
 		
 		self.assertEqual(prettify_delta(timedelta(seconds=3600+60+1)),
 				'1 hour, 1 minute, 1 second')
-
-
-
