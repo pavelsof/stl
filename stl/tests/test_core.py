@@ -100,6 +100,3 @@ class CoreTestCase(TestCase):
 		
 		year_dir = os.path.join(self.temp_dir.name, str(dt1.year))
 		shutil.rmtree(year_dir)
-
-
-

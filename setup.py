@@ -17,17 +17,17 @@ with open(os.path.join(BASE_DIR, 'README.rst')) as f:
 setup(
 	name = 'stltimelogger',
 	version = __version__,
-	
+
 	description = 'cli time logger',
 	long_description = README,
-	
+
 	url = 'https://github.com/pavelsof/stl',
-	
+
 	author = 'Pavel Sofroniev',
 	author_email = 'pavelsof@gmail.com',
-	
+
 	license = 'MIT',
-	
+
 	classifiers = [
 		'Development Status :: 4 - Beta',
 		'Environment :: Console',
@@ -37,13 +37,13 @@ setup(
 		'Programming Language :: Python :: 3 :: Only'
 	],
 	keywords = 'cli time logger',
-	
+
 	packages = find_packages(),
 	install_requires = [],
-	
+
 	test_suite = 'stl.tests',
 	tests_require = ['pytz', 'hypothesis >= 3.5'],
-	
+
 	entry_points = {
 		'console_scripts': [
 			'stl = stl.cli:main'
