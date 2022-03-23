@@ -2,13 +2,15 @@ from datetime import date, datetime, timedelta
 from itertools import permutations
 from unittest import TestCase
 
-from hypothesis.extra.datetime import dates, datetimes
-from hypothesis.strategies import just, sampled_from
+from hypothesis.strategies import dates, datetimes, just, sampled_from
 from hypothesis import assume, example, given
 
 from stl.time import Parser
 from stl.time import prettify_date, prettify_datetime, prettify_delta
 
+
+MIN_DATE = date(1000, 1, 1)
+MIN_DATETIME = datetime(1000, 1, 1)
 
 
 class ParserTestCase(TestCase):
@@ -17,17 +19,15 @@ class ParserTestCase(TestCase):
         self.now = datetime(2016, 10, 15)
         self.parser = Parser(self.now)
 
-
-    @given(dates(min_year=1000))
+    @given(dates(min_value=MIN_DATE))
     def test_extract_year(self, d):
         s = d.strftime('%Y')
         year = self.parser.extract_year(s)
         self.assertEqual(year, d.year)
 
-
-    @given(dates(min_year=1000),
-            just('%Y'),
-            sampled_from(['%m', '%b', '%B']))
+    @given(dates(min_value=MIN_DATE),
+           just('%Y'),
+           sampled_from(['%m', '%b', '%B']))
     def test_extract_month(self, d, y_code, m_code):
         for perm in permutations([y_code, m_code]):
             s = d.strftime(' '.join(perm))
@@ -39,7 +39,6 @@ class ParserTestCase(TestCase):
         year, month = self.parser.extract_month(s)
         self.assertEqual(year, self.now.year)
         self.assertEqual(month, d.month)
-
 
     def test_extract_week(self):
         monday, sunday = self.parser.extract_week('')
@@ -54,11 +53,10 @@ class ParserTestCase(TestCase):
         self.assertEqual(monday, date(2016, 10, 3))
         self.assertEqual(sunday, date(2016, 10, 9))
 
-
-    @given(dates(min_year=1000),
-            just('%Y'),
-            sampled_from(['%b', '%B']),
-            sampled_from(['%d']))
+    @given(dates(min_value=MIN_DATE),
+           just('%Y'),
+           sampled_from(['%b', '%B']),
+           sampled_from(['%d']))
     def test_extract_date(self, d, y_code, m_code, d_code):
         for perm in permutations([y_code, m_code, d_code]):
             s = d.strftime(' '.join(perm))
@@ -80,14 +78,12 @@ class ParserTestCase(TestCase):
         self.assertEqual(res.month, self.now.month)
         self.assertEqual(res.day, d.day)
 
-
-    @given(dates(min_year=1000))
+    @given(dates(min_value=MIN_DATE))
     def test_extract_date_iso(self, d):
         res = self.parser.extract_date(d.isoformat())
         self.assertEqual(res.year, d.year)
         self.assertEqual(res.month, d.month)
         self.assertEqual(res.day, d.day)
-
 
     def test_extract_words(self):
         year = self.parser.extract_year('last')
@@ -118,8 +114,7 @@ class ParserTestCase(TestCase):
             self.assertEqual(res.month, self.now.month)
             self.assertEqual(res.day, self.now.day)
 
-
-    @given(datetimes(min_year=1000, timezones=[]))
+    @given(datetimes(min_value=MIN_DATETIME))
     @example(datetime(2017, 1, 1))
     def test_extract_month_words(self, dt):
         parser = Parser(dt)
@@ -137,8 +132,7 @@ class ParserTestCase(TestCase):
             self.assertEqual(year, dt.year)
             self.assertEqual(month, dt.month)
 
-
-    @given(datetimes(min_year=1000, timezones=[]))
+    @given(datetimes(min_value=MIN_DATETIME))
     @example(datetime(2016, 10, 1))
     def test_extract_date_words(self, dt):
         parser = Parser(dt)
@@ -153,14 +147,12 @@ class ParserTestCase(TestCase):
             res = parser.extract_date(word)
             self.assertEqual(res, today)
 
-
-    @given(datetimes(timezones=[]))
+    @given(datetimes())
     def test_extract_datetime(self, dt):
         res = self.parser.extract_datetime(dt.isoformat())
 
         for prop in ['year', 'month', 'day', 'hour', 'minute']:
             self.assertEqual(getattr(res, prop), getattr(dt, prop))
-
 
     def test_extract_span_errors(self):
         with self.assertRaises(ValueError):
@@ -174,7 +166,6 @@ class ParserTestCase(TestCase):
 
         with self.assertRaises(ValueError):
             self.parser.extract_span('sep 2016')
-
 
     def test_extract_span(self):
         d1, d2 = self.parser.extract_span('10')
@@ -205,8 +196,7 @@ class ParserTestCase(TestCase):
         self.assertEqual(d1, date(2014, 9, 10))
         self.assertEqual(d2, date(2015, 10, 12))'''
 
-
-    @given(dates(min_year=1000, max_year=2015))
+    @given(dates(min_value=MIN_DATE, max_value=date(2015, 1, 1)))
     def test_extract_span_one_date(self, d):
         assume(d < self.now.date())
 
@@ -220,15 +210,13 @@ class ParserTestCase(TestCase):
         self.assertEqual(d2, self.now.date())'''
 
 
-
 class PrettifyTestCase(TestCase):
 
     def setUp(self):
         self.now = datetime(2016, 10, 15)
         self.parser = Parser(self.now)
 
-
-    @given(dates(min_year=1000))
+    @given(dates(min_value=MIN_DATE))
     def test_prettify_date(self, d):
         s = prettify_date(d.year, d.month, d.day)
         res = self.parser.extract_date(s)
@@ -241,8 +229,7 @@ class PrettifyTestCase(TestCase):
         self.assertEqual(year, d.year)
         self.assertEqual(month, d.month)
 
-
-    @given(datetimes(min_year=1000, timezones=[]))
+    @given(datetimes(min_value=MIN_DATETIME))
     def test_prettify_datetime(self, dt):
         s = prettify_datetime(dt)
         parts = s.rsplit(maxsplit=1)
@@ -256,7 +243,6 @@ class PrettifyTestCase(TestCase):
         self.assertEqual(hour, dt.hour)
         self.assertEqual(minute, dt.minute)
 
-
     def test_prettify_delta(self):
         self.assertEqual(prettify_delta(timedelta(hours=1)), '1 hour')
         self.assertEqual(prettify_delta(timedelta(hours=2)), '2 hours')
@@ -268,4 +254,4 @@ class PrettifyTestCase(TestCase):
         self.assertEqual(prettify_delta(timedelta(seconds=2)), '2 seconds')
 
         self.assertEqual(prettify_delta(timedelta(seconds=3600+60+1)),
-                '1 hour, 1 minute, 1 second')
+                         '1 hour, 1 minute, 1 second')

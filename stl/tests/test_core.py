@@ -1,18 +1,17 @@
-from datetime import timedelta
-
 import os.path
 import shutil
-
+from datetime import datetime, timedelta
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 from unittest import TestCase
 
-from hypothesis.extra.datetime import datetimes
-from hypothesis.strategies import text
+from hypothesis.strategies import datetimes, text
 from hypothesis import assume, given
 
 from stl.core import Core
 
+
+MIN_DATETIME = datetime(1000, 1, 1)
 
 
 class CoreTestCase(TestCase):
@@ -21,15 +20,13 @@ class CoreTestCase(TestCase):
         self.temp_dir = TemporaryDirectory()
 
         with patch.object(Core, '_get_dir_path',
-                return_value=self.temp_dir.name) as mock_method:
+                          return_value=self.temp_dir.name) as mock_method:
             self.core = Core()
             mock_method.assert_called_once_with()
             self.assertEqual(self.core.dir_path, self.temp_dir.name)
 
-
     def tearDown(self):
         self.temp_dir.cleanup()
-
 
     def _check_dt_equal(self, dt1, dt2, seconds=False):
         self.assertEqual(dt1.year, dt2.year)
@@ -40,14 +37,12 @@ class CoreTestCase(TestCase):
         if seconds:
             self.assertEqual(dt1.second, dt2.second)
 
-
     def test_init_with_bad_dir(self):
         keine_dir = os.path.join(self.temp_dir.name, 'keine')
         with self.assertRaises(ValueError):
             Core(dir_path=keine_dir)
 
-
-    @given(datetimes(timezones=[]), text())
+    @given(datetimes(), text())
     def test_start(self, dt, t):
         res = self.core.start(t, now=dt)
         self.assertTrue(res.startswith('started'))
@@ -59,9 +54,8 @@ class CoreTestCase(TestCase):
         self._check_dt_equal(entry['stamp'], dt, seconds=True)
         self.assertEqual(entry['task'], self.core.db._sanitise_text(t))
 
-
-    @given(datetimes(min_year=1000, timezones=[]),
-            datetimes(min_year=1000, timezones=[]))
+    @given(datetimes(min_value=MIN_DATETIME),
+           datetimes(min_value=MIN_DATETIME))
     def test_stop(self, dt1, dt2):
         assume(dt1 < dt2)
         self.core.start('lumberjacking', now=dt1)
@@ -82,10 +76,9 @@ class CoreTestCase(TestCase):
         year_dir = os.path.join(self.temp_dir.name, str(dt1.year))
         shutil.rmtree(year_dir)
 
-
-    @given(datetimes(min_year=1000, timezones=[]),
-            datetimes(min_year=1000, timezones=[]),
-            text())
+    @given(datetimes(min_value=MIN_DATETIME),
+           datetimes(min_value=MIN_DATETIME),
+           text())
     def test_add(self, dt1, dt2, t):
         assume(dt1 < dt2 and dt2 - dt1 > timedelta(minutes=1))
         self.core.add(dt1.isoformat(), dt2.isoformat(), t)
