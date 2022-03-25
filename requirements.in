@@ -1,0 +1,8 @@
+# stl itself
+-e file:.
+
+# testing
+hypothesis
+
+# other tools
+pip-tools
