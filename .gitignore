@@ -1,12 +1,18 @@
-build/*
-dist/*
-meta/*
-stltimelogger.egg-info/*
+# virtual env
+/venv
 
-.eggs/*
-.hypothesis/*
+# packaging
+/.eggs
+/build
+/dist
+/stltimelogger.egg-info
 
-.coverage
+# testing
+/.coverage
+/.hypothesis
 
+# cache
 *.pyc
+
+# editors
 *.swp
