@@ -1,6 +1,9 @@
 # stl itself
 -e file:.
 
+# packaging
+flit
+
 # testing
 hypothesis
 
