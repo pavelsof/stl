@@ -25,7 +25,7 @@ project setup
     pip-sync
 
     # run the tests
-    python setup.py test
+    python -m unittest
 
 
 conventions

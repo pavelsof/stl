@@ -9,12 +9,10 @@ from stl.cli import Cli
 from stl.core import Core
 
 
-
 class CliTestCase(TestCase):
 
     def setUp(self):
         self.cli = Cli()
-
 
     @given(fixed_dictionaries({
             'task': text().filter(lambda t: not t.startswith('-')),
@@ -31,7 +29,6 @@ class CliTestCase(TestCase):
             self.cli.run(args)
             mock_start.assert_called_once_with(task=d['task'])
 
-
     @given(fixed_dictionaries({
             'verbose': sampled_from(['-v', '--verbose', ''])}))
     def test_stop(self, d):
@@ -43,7 +40,6 @@ class CliTestCase(TestCase):
         with patch.object(Core, 'stop') as mock_stop:
             self.cli.run(args)
             mock_stop.assert_called_once_with()
-
 
     @given(fixed_dictionaries({
             'task': text().filter(lambda t: not t.startswith('-')),
@@ -59,7 +55,6 @@ class CliTestCase(TestCase):
         with patch.object(Core, 'switch') as mock_switch:
             self.cli.run(args)
             mock_switch.assert_called_once_with(task=d['task'])
-
 
     @given(fixed_dictionaries({
             'command': sampled_from(['status', 'show']),
@@ -98,7 +93,6 @@ class CliTestCase(TestCase):
             self.cli.run(args)
             mock_status.assert_called_once_with(extra=extra)
 
-
     @given(fixed_dictionaries({
             'start': text(min_size=1).filter(lambda t: not t.startswith('-')),
             'stop': text(min_size=1).filter(lambda t: not t.startswith('-')),
@@ -115,7 +109,6 @@ class CliTestCase(TestCase):
         with patch.object(Core, 'add') as mock_add:
             self.cli.run(args)
             mock_add.assert_called_once_with(d['start'], d['stop'], d['task'])
-
 
     @given(fixed_dictionaries({
             'month': text().filter(lambda t: not t.startswith('-')),

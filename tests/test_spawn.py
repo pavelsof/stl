@@ -6,7 +6,6 @@ from unittest import TestCase
 from stl.spawn import Spawner
 
 
-
 class SpawnerTestCase(TestCase):
 
     def setUp(self):
