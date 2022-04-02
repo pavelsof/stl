@@ -233,7 +233,7 @@ class Database:
         the given date. The [] is sorted by the start datetime.
         """
         return list(filter(lambda d: d['start'].day == day,
-                self.get_month(year, month)))
+                           self.get_month(year, month)))
 
     def get_year(self, year):
         """
@@ -241,8 +241,8 @@ class Database:
         the given year. The [] is sorted by the start datetime.
         """
         return [item
-            for month in range(1, 13)
-            for item in self.get_month(year, month)]
+                for month in range(1, 13)
+                for item in self.get_month(year, month)]
 
     def get_span(self, start, end):
         """
@@ -252,7 +252,8 @@ class Database:
         """
         if start.year == end.year and start.month == end.month:
             return [log for log in self.get_month(start.year, start.month)
-                if log['start'].date() >= start and log['start'].date() <= end]
+                    if log['start'].date() >= start
+                    and log['start'].date() <= end]
 
         logs = [log for log in self.get_month(start.year, start.month)
                 if log['start'].date() >= start]
@@ -372,8 +373,8 @@ class Database:
         """
         s = '{}-{:02}'.format(year, month)
 
-        tasks = [item['task']
-                for item in self.get_month(year, month) if item['task']]
+        tasks = [item['task'] for item in self.get_month(year, month)
+                 if item['task']]
 
         lines = self._read_tasks_file(os.path.join(self.dir_path, 'tasks'))
 

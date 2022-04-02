@@ -59,22 +59,28 @@ class CliTestCase(TestCase):
     @given(fixed_dictionaries({
             'command': sampled_from(['status', 'show']),
             'extra': one_of(
-                tuples(just('day'),
+                tuples(
+                    just('day'),
                     sampled_from(['-d', '--day']),
                     text(min_size=1).filter(lambda t: not t.startswith('-'))),
-                tuples(just('week'),
+                tuples(
+                    just('week'),
                     sampled_from(['-w', '--week']),
                     text(min_size=1).filter(lambda t: not t.startswith('-'))),
-                tuples(just('month'),
+                tuples(
+                    just('month'),
                     sampled_from(['-m', '--month']),
                     text(min_size=1).filter(lambda t: not t.startswith('-'))),
-                tuples(just('year'),
+                tuples(
+                    just('year'),
                     sampled_from(['-y', '--year']),
                     text(min_size=1).filter(lambda t: not t.startswith('-'))),
-                tuples(just('span'),
+                tuples(
+                    just('span'),
                     sampled_from(['-s', '--span']),
                     text(min_size=1).filter(lambda t: not t.startswith('-'))),
-                tuples(just('task'),
+                tuples(
+                    just('task'),
                     sampled_from(['-t', '--task']),
                     text(min_size=1).filter(lambda t: not t.startswith('-'))),
                 just(None)),

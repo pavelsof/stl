@@ -68,7 +68,8 @@ class Status:
             for task, delta in tasks
         ])
 
-        if not tasks: tasks = '-'
+        if not tasks:
+            tasks = '-'
 
         return '\n'.join([
             'tasks: {}'.format(tasks),
@@ -141,8 +142,8 @@ class Status:
 
         started = logs[0]['start']
         last_mod = logs[-1]['stop']
-        hours = reduce(lambda x,y: x+y,
-                    [log['stop']-log['start'] for log in logs])
+        hours = reduce(lambda x, y: x+y,
+                       [log['stop']-log['start'] for log in logs])
 
         return '\n'.join([
             '[{}]'.format(task),

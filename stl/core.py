@@ -130,7 +130,8 @@ class Core:
         self.db.add_complete(curr['stamp'], now, curr['task'])
 
         try:
-            self.db.add_task(curr['task'], curr['stamp'].year, curr['stamp'].month)
+            self.db.add_task(
+                    curr['task'], curr['stamp'].year, curr['stamp'].month)
         except ValueError:
             pass
 

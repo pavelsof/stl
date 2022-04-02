@@ -202,7 +202,10 @@ class Parser:
             return date(self.now.year, combos[0][0], combos[0][1])
 
         elif len(li) == 3:
-            combos = self._try([self._get_year, self._get_month, self._get_day], li)
+            combos = self._try([self._get_year,
+                                self._get_month,
+                                self._get_day],
+                               li)
             if len(combos) != 1:
                 raise ValueError('Could not infer date: {}'.format(s))
 
@@ -233,27 +236,30 @@ class Parser:
         tags = []
         for token in tokens:
             if token.isdigit():
-                if len(token) == 4: tags.append('y')
-                else: tags.append('d')
-            else: tags.append('m')
+                if len(token) == 4:
+                    tags.append('y')
+                else:
+                    tags.append('d')
+            else:
+                tags.append('m')
 
         if set(tags[-3:]) == set(['d', 'm', 'y']):
             assert len(tokens) in [3, 4, 5, 6]
 
             d2 = date(self._get_year(tokens[-3:][tags[-3:].index('y')]),
-                    self._get_month(tokens[-3:][tags[-3:].index('m')]),
-                    self._get_day(tokens[-3:][tags[-3:].index('d')]))
+                      self._get_month(tokens[-3:][tags[-3:].index('m')]),
+                      self._get_day(tokens[-3:][tags[-3:].index('d')]))
 
             if len(tokens) == 6:
                 assert set(tags[:3]) == set(['d', 'm', 'y'])
                 d1 = date(self._get_year(tokens[tags[:3].index('y')]),
-                        self._get_month(tokens[tags[:3].index('m')]),
-                        self._get_day(tokens[tags[:3].index('d')]))
+                          self._get_month(tokens[tags[:3].index('m')]),
+                          self._get_day(tokens[tags[:3].index('d')]))
             elif len(tokens) == 5:
                 assert set(tags[:2]) == set(['d', 'm'])
                 d1 = date(d2.year,
-                        self._get_month(tokens[tags[:2].index('m')]),
-                        self._get_day(tokens[tags[:2].index('d')]))
+                          self._get_month(tokens[tags[:2].index('m')]),
+                          self._get_day(tokens[tags[:2].index('d')]))
             elif len(tokens) == 4:
                 assert tags[0] == 'd'
                 d1 = date(d2.year, d2.month)
@@ -264,14 +270,14 @@ class Parser:
             assert len(tokens) in [2, 3, 4]
 
             d2 = date(self.now.year,
-                    self._get_month(tokens[-2:][tags[-2:].index('m')]),
-                    self._get_day(tokens[-2:][tags[-2:].index('d')]))
+                      self._get_month(tokens[-2:][tags[-2:].index('m')]),
+                      self._get_day(tokens[-2:][tags[-2:].index('d')]))
 
             if len(tokens) == 4:
                 assert set(tags[:2]) == set(['d', 'm'])
                 d1 = date(d2.year,
-                        self._get_month(tokens[tags[:2].index('m')]),
-                        self._get_day(tokens[tags[:2].index('d')]))
+                          self._get_month(tokens[tags[:2].index('m')]),
+                          self._get_day(tokens[tags[:2].index('d')]))
             elif len(tokens) == 3:
                 assert tags[0] == 'd'
                 d1 = date(d2.year, d2.month, self._get_day(tokens[0]))
@@ -321,6 +327,7 @@ class Parser:
 Functions that convert time units into pretty strings for human consumption
 """
 
+
 def prettify_date(year, month, day=None):
     """
     Returns a human-readable string representing the date defined by the given
@@ -367,6 +374,7 @@ def prettify_delta(delta):
             li.append(s)
 
     s = ', '.join(li)
-    if not s: s = '-'
+    if not s:
+        s = '-'
 
     return s

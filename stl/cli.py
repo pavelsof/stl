@@ -27,15 +27,18 @@ class Cli:
 
         self.parser = argparse.ArgumentParser(usage=usage, description=desc)
 
-        self.parser.add_argument('--version', action='version', version=__version__)
-        self.parser.add_argument('-v', '--verbose', action='store_true',
-            help='print debug info')
-        self.parser.add_argument('--dir', help=(
-            'set the directory where the data will be saved; '
-            'defaults to ~/.config/stl or ~/.stl'))
+        self.parser.add_argument(
+                '--version', action='version', version=__version__)
+        self.parser.add_argument(
+                '-v', '--verbose', action='store_true',
+                help='print debug info')
+        self.parser.add_argument(
+                '--dir',
+                help=('set the directory where the data will be saved; '
+                      'defaults to ~/.config/stl or ~/.stl'))
 
-        self.subparsers = self.parser.add_subparsers(dest='command',
-            title='subcommands')
+        self.subparsers = self.parser.add_subparsers(
+                dest='command', title='subcommands')
 
         self._init_start()
         self._init_stop()
@@ -59,11 +62,12 @@ class Cli:
             'make a log that you are starting to work'
         )
 
-        subp = self.subparsers.add_parser('start', usage=usage,
-            description=desc, help=desc)
+        subp = self.subparsers.add_parser(
+                'start', usage=usage, description=desc, help=desc)
 
-        subp.add_argument('task', nargs=argparse.REMAINDER,
-            help='the task that you are about to start working on')
+        subp.add_argument(
+                'task', nargs=argparse.REMAINDER,
+                help='the task that you are about to start working on')
 
         subp.set_defaults(func=start)
 
@@ -79,8 +83,8 @@ class Cli:
             'make a log that you just stopped working'
         )
 
-        subp = self.subparsers.add_parser('stop', usage=usage,
-            description=desc, help=desc)
+        subp = self.subparsers.add_parser(
+                'stop', usage=usage, description=desc, help=desc)
 
         subp.set_defaults(func=stop)
 
@@ -98,11 +102,13 @@ class Cli:
             'stop the current task and immediately start another one'
         )
 
-        subp = self.subparsers.add_parser('switch', usage=usage,
-            description=desc, help=desc[:desc.find(';')])
+        subp = self.subparsers.add_parser(
+                'switch', usage=usage, description=desc,
+                help=desc[:desc.find(';')])
 
-        subp.add_argument('task', nargs=argparse.REMAINDER,
-            help='the task that you are about to start working on')
+        subp.add_argument(
+                'task', nargs=argparse.REMAINDER,
+                help='the task that you are about to start working on')
 
         subp.set_defaults(func=switch)
 
@@ -130,35 +136,42 @@ class Cli:
             'it will tell you what you are doing now'
         )
 
-        subp = self.subparsers.add_parser('status', aliases=['show'],
-            usage=usage, description=desc, help=desc[:desc.find(';')])
+        subp = self.subparsers.add_parser(
+                'status', aliases=['show'], usage=usage, description=desc,
+                help=desc[:desc.find(';')])
 
         group = subp.add_mutually_exclusive_group()
-        group.add_argument('-d', '--day', nargs=argparse.REMAINDER, help=(
-            'report for the given day, '
-            'e.g. 15 oct, 2016-10-15, today, yesterday; '
-            'empty string defaults to today'))
-        group.add_argument('-w', '--week', nargs=argparse.REMAINDER, help=(
-            'report for the given week, '
-            'possible values are this and last; '
-            'empty string defaults to this week'))
-        group.add_argument('-m', '--month', nargs=argparse.REMAINDER, help=(
-            'report for the given month, '
-            'e.g. oct, 10, 10 2016, this, last; '
-            'empty string defaults to this month'))
-        group.add_argument('-y', '--year', nargs=argparse.REMAINDER, help=(
-            'report for the given year, '
-            'e.g. 2016, this, last; '
-            'empty string defaults to this year'))
-        group.add_argument('-s', '--span', nargs=argparse.REMAINDER, help=(
-            'report for the time span between two dates (inclusive), '
-            'e.g. 15 25 oct, 15 sep 2016 25 oct 2016, 15 sep 25 oct; '
-            'if you specify only one date, the second will be set to today; '
-            'some restrictions: '
-            'the second date (if such) cannot be less specific than the first '
-            'and months cannot be numbers'))
-        group.add_argument('-t', '--task', nargs=argparse.REMAINDER,
-            help='report for the given task')
+        group.add_argument(
+                '-d', '--day', nargs=argparse.REMAINDER,
+                help=('report for the given day, '
+                      'e.g. 15 oct, 2016-10-15, today, yesterday; '
+                      'empty string defaults to today'))
+        group.add_argument(
+                '-w', '--week', nargs=argparse.REMAINDER,
+                help=('report for the given week, '
+                      'possible values are this and last; '
+                      'empty string defaults to this week'))
+        group.add_argument(
+                '-m', '--month', nargs=argparse.REMAINDER,
+                help=('report for the given month, '
+                      'e.g. oct, 10, 10 2016, this, last; '
+                      'empty string defaults to this month'))
+        group.add_argument(
+                '-y', '--year', nargs=argparse.REMAINDER,
+                help=('report for the given year, '
+                      'e.g. 2016, this, last; '
+                      'empty string defaults to this year'))
+        group.add_argument(
+                '-s', '--span', nargs=argparse.REMAINDER,
+                help=('report for the time span between two dates '
+                      '(inclusive), e.g. 15 25 oct, 15 sep 2016 25 oct 2016, '
+                      '15 sep 25 oct; if you specify only one date, '
+                      'the second will be set to today; some restrictions: '
+                      'the second date (if such) cannot be less specific '
+                      'than the first and months cannot be numbers'))
+        group.add_argument(
+                '-t', '--task', nargs=argparse.REMAINDER,
+                help='report for the given task')
 
         subp.set_defaults(func=status)
 
@@ -176,15 +189,19 @@ class Cli:
             'stl.core.Core.add()'
         )
 
-        subp = self.subparsers.add_parser('add', usage=usage,
-            description=desc, help=desc[:desc.find(';')])
+        subp = self.subparsers.add_parser(
+                'add', usage=usage, description=desc,
+                help=desc[:desc.find(';')])
 
-        subp.add_argument('start',
-            help='when work on the task started; use %%Y-%%m-%%dT%%H:%%M')
-        subp.add_argument('stop',
-            help='when work on the task stopped; use %%Y-%%m-%%dT%%H:%%M')
-        subp.add_argument('task', nargs='?', default='',
-            help='the task being worked on; optional')
+        subp.add_argument(
+                'start',
+                help='when work on the task started; use %%Y-%%m-%%dT%%H:%%M')
+        subp.add_argument(
+                'stop',
+                help='when work on the task stopped; use %%Y-%%m-%%dT%%H:%%M')
+        subp.add_argument(
+                'task', nargs='?', default='',
+                help='the task being worked on; optional')
 
         subp.set_defaults(func=add)
 
@@ -201,11 +218,12 @@ class Cli:
             'lets you vim the right file'
         )
 
-        subp = self.subparsers.add_parser('edit', usage=usage,
-            description=desc, help=desc)
+        subp = self.subparsers.add_parser(
+                'edit', usage=usage, description=desc, help=desc)
 
-        subp.add_argument('month', nargs=argparse.REMAINDER,
-            help='the month you want to edit, e.g. oct 2016')
+        subp.add_argument(
+                'month', nargs=argparse.REMAINDER,
+                help='the month you want to edit, e.g. oct 2016')
 
         subp.set_defaults(func=edit)
 
@@ -240,4 +258,5 @@ def main():
     """
     cli = Cli()
     res = cli.run()
-    if res: print(res.strip())
+    if res:
+        print(res.strip())
