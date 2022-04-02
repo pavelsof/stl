@@ -8,4 +8,5 @@ flit
 hypothesis
 
 # other tools
+flake8
 pip-tools
