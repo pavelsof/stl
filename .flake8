@@ -1,0 +1,13 @@
+[flake8]
+
+# keep the default excludes (.git, __pycache__, etc.)
+extend_exclude =
+
+	# the virtual env
+	./venv
+
+# print the source code generating the error
+show_source = True
+
+# print some counts at the end
+statistics = True

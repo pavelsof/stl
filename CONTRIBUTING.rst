@@ -27,6 +27,9 @@ project setup
     # run the tests
     python -m unittest
 
+    # check for PEP8 issues
+    flake8
+
 
 conventions
 ===========
