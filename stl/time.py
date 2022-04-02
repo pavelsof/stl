@@ -4,14 +4,12 @@ from itertools import permutations
 import logging
 
 
-
 """
 The str(f|p)time format for ISO datetime strings with minute-precision and the
 expected length for such strings.
 """
 ISO_FORMAT = '%Y-%m-%dT%H:%M'
 ISO_FORMAT_LEN = 16
-
 
 
 class Parser:
@@ -26,7 +24,6 @@ class Parser:
         """
         self.now = now
         self.log = logging.getLogger(__name__)
-
 
     def _try(self, funcs, args):
         """
@@ -50,7 +47,6 @@ class Parser:
 
         return combos
 
-
     def _get_year(self, s):
         """
         Returns the year represented by the given string by trying the year
@@ -65,7 +61,6 @@ class Parser:
                 return dt.year
         else:
             raise ValueError('Could not extract year: {}'.format(s))
-
 
     def _get_month(self, s):
         """
@@ -84,7 +79,6 @@ class Parser:
         else:
             raise ValueError('Could not extract month: {}'.format(s))
 
-
     def _get_day(self, s):
         """
         Returns the day represented by the given string by trying the day
@@ -96,7 +90,6 @@ class Parser:
             raise ValueError('Could not extract day: {}'.format(s))
         else:
             return dt.day
-
 
     def extract_year(self, s):
         """
@@ -110,7 +103,6 @@ class Parser:
             return self.now.year - 1
 
         return self._get_year(s)
-
 
     def extract_month(self, s):
         """
@@ -145,7 +137,6 @@ class Parser:
         else:
             raise ValueError('Could not infer month: {}'.format(s))
 
-
     def extract_week(self, s):
         """
         Returns a (date1, date2) tuple with date1 being a Monday and date2
@@ -173,7 +164,6 @@ class Parser:
 
         else:
             raise ValueError('Could not infer week: {}'.format(s))
-
 
     def extract_date(self, s):
         """
@@ -221,7 +211,6 @@ class Parser:
         else:
             raise ValueError('Could not infer date: {}'.format(s))
 
-
     def extract_datetime(self, s):
         """
         Returns a datetime instance extracted from the given string. Unlike the
@@ -234,7 +223,6 @@ class Parser:
             raise ValueError('Could not infer datetime: {}'.format(s))
 
         return dt
-
 
     def _extract_span(self, tokens):
         """
@@ -306,7 +294,6 @@ class Parser:
 
         return d1, d2
 
-
     def extract_span(self, s):
         """
         Returns a (d1, d2) tuple of date instances extracted from the given
@@ -330,7 +317,6 @@ class Parser:
         return d1, d2
 
 
-
 """
 Functions that convert time units into pretty strings for human consumption
 """
@@ -350,7 +336,6 @@ def prettify_date(year, month, day=None):
     return s.lower()
 
 
-
 def prettify_datetime(dt):
     """
     Returns a pretty string representing the given datetime instance. Units
@@ -360,7 +345,6 @@ def prettify_datetime(dt):
         prettify_date(dt.year, dt.month, dt.day),
         dt.strftime('%H:%M')
     ])
-
 
 
 def prettify_delta(delta):

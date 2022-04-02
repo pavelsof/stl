@@ -10,13 +10,11 @@ If echo $EDITOR is None, these will be tried in order.
 FALLBACK_EDITORS = ['vim', 'vi']
 
 
-
 class SpawnError(ValueError):
     """
     Raised when there is a problem with calling an external programme.
     """
     pass
-
 
 
 class Spawner:
@@ -29,7 +27,6 @@ class Spawner:
         Constructor. Inits the logging facility.
         """
         self.log = logging.getLogger(__name__)
-
 
     def _get_editor(self):
         """
@@ -45,7 +42,6 @@ class Spawner:
                 return editor
 
         raise SpawnError('Could not find an editor')
-
 
     def edit(self, file_path):
         """

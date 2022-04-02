@@ -4,7 +4,6 @@ from stl.core import Core
 from stl import __version__
 
 
-
 class Cli:
     """
     Singleton that handles the user input, inits the whole machinery, and takes
@@ -47,7 +46,6 @@ class Cli:
         self._init_add()
         self._init_edit()
 
-
     def _init_start(self):
         """
         Inits the subparser that handles the start command.
@@ -69,7 +67,6 @@ class Cli:
 
         subp.set_defaults(func=start)
 
-
     def _init_stop(self):
         """
         Inits the subparser that handles the stop command.
@@ -86,7 +83,6 @@ class Cli:
             description=desc, help=desc)
 
         subp.set_defaults(func=stop)
-
 
     def _init_switch(self):
         """
@@ -109,7 +105,6 @@ class Cli:
             help='the task that you are about to start working on')
 
         subp.set_defaults(func=switch)
-
 
     def _init_status(self):
         """
@@ -167,7 +162,6 @@ class Cli:
 
         subp.set_defaults(func=status)
 
-
     def _init_add(self):
         """
         Inits the subparser that handles the add command.
@@ -194,7 +188,6 @@ class Cli:
 
         subp.set_defaults(func=add)
 
-
     def _init_edit(self):
         """
         Inits the subparser that handles the edit command.
@@ -215,7 +208,6 @@ class Cli:
             help='the month you want to edit, e.g. oct 2016')
 
         subp.set_defaults(func=edit)
-
 
     def run(self, raw_args=None):
         """
@@ -238,7 +230,6 @@ class Cli:
             return str(err)
 
         return res
-
 
 
 def main():

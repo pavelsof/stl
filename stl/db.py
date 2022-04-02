@@ -6,7 +6,6 @@ import logging
 import os
 
 
-
 """
 The str(f|p)time format used in the database files and the expected length of
 the formatted strings.
@@ -18,13 +17,11 @@ ARCHIVE_DT_FORMAT = '%Y-%m-%d %H:%M'
 ARCHIVE_DT_FORMAT_LEN = 16
 
 
-
 class DatabaseError(ValueError):
     """
     Raised when writing or retrieving data files.
     """
     pass
-
 
 
 class Database:
@@ -44,14 +41,12 @@ class Database:
         self.log = logging.getLogger(__name__)
         self.dir_path = dir_path
 
-
     def _sanitise_text(self, text):
         """
         Prepares the given text for writing to a database file. Also, the NUL
         byte is removed as it breaks the csv reader.
         """
         return text.replace('\0', '').strip()
-
 
     """
     Methods handling the current log
@@ -75,7 +70,6 @@ class Database:
             writer.writerow(entry)
 
         self.log.debug('Added an open log entry: '+str(entry))
-
 
     def get_current(self, delete=False):
         """
@@ -117,7 +111,6 @@ class Database:
 
         return entry
 
-
     """
     Methods handling the archive logs
     """
@@ -139,7 +132,6 @@ class Database:
 
         return os.path.join(year_dir, str(month).zfill(2))
 
-
     def _read_entry(self, line):
         """
         De-serialises a raw archive log file line and returns {start, stop,
@@ -156,7 +148,6 @@ class Database:
 
         return {'start': start, 'stop': stop, 'task': task}
 
-
     def _sort_lines(self, lines):
         """
         Returns the given [] of archive log file lines but sorted by the start
@@ -170,7 +161,6 @@ class Database:
                 raise ValueError
 
         return list(sorted(lines, key=sort_key_func))
-
 
     def add_complete(self, start, stop, task='', append=True):
         """
@@ -212,7 +202,6 @@ class Database:
 
         self.log.debug('Added log entry: '+str(entry))
 
-
     def get_month(self, year, month):
         """
         Returns the [] of {start, stop, task} for the archive log entries for
@@ -238,7 +227,6 @@ class Database:
 
         return list(sorted(li, key=lambda d: d['start']))
 
-
     def get_day(self, year, month, day):
         """
         Returns the [] of {start, stop, task} for the archive log entries for
@@ -246,7 +234,6 @@ class Database:
         """
         return list(filter(lambda d: d['start'].day == day,
                 self.get_month(year, month)))
-
 
     def get_year(self, year):
         """
@@ -256,7 +243,6 @@ class Database:
         return [item
             for month in range(1, 13)
             for item in self.get_month(year, month)]
-
 
     def get_span(self, start, end):
         """
@@ -286,7 +272,6 @@ class Database:
 
         return logs
 
-
     """
     Methods handling the tasks file
     """
@@ -304,7 +289,6 @@ class Database:
                     lines.append(line)
 
         return lines
-
 
     def add_task(self, task, year, month):
         """
@@ -345,7 +329,6 @@ class Database:
 
         self.log.debug('Added time entry for task {}: {}'.format(task, entry))
 
-
     def get_task(self, task):
         """
         Returns the [] of (year, month) tuples for which the given task has
@@ -377,7 +360,6 @@ class Database:
             li.append(item)
 
         return li
-
 
     def check_month_tasks(self, year, month):
         """

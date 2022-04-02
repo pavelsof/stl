@@ -6,7 +6,6 @@ import logging
 from stl.time import prettify_date, prettify_datetime, prettify_delta
 
 
-
 class Status:
     """
     Represents an answer to an inquiry about the status. Knows what comprises
@@ -22,7 +21,6 @@ class Status:
         """
         self.db = db
         self.log = logging.getLogger(__name__)
-
 
     def get_current_info(self, now):
         """
@@ -44,7 +42,6 @@ class Status:
         li.append('elapsed: {}'.format(prettify_delta(delta)))
 
         return '\n'.join(li)
-
 
     def _get_time_info(self, logs):
         """
@@ -78,7 +75,6 @@ class Status:
             'total: {}'.format(prettify_delta(hours))
         ])
 
-
     def get_day_info(self, d):
         """
         Returns a human-readable string containing info about the work done
@@ -89,7 +85,6 @@ class Status:
             '[{}]'.format(prettify_date(d.year, d.month, d.day)),
             self._get_time_info(logs)
         ])
-
 
     def get_month_info(self, year, month):
         """
@@ -102,7 +97,6 @@ class Status:
             self._get_time_info(logs)
         ])
 
-
     def get_year_info(self, year):
         """
         Returns a human-readable string containing info about the work done
@@ -113,7 +107,6 @@ class Status:
             '[{}]'.format(year),
             self._get_time_info(logs)
         ])
-
 
     def get_span_info(self, d1, d2):
         """
@@ -129,7 +122,6 @@ class Status:
             '[{} to {}]'.format(pretty_d1, pretty_d2),
             self._get_time_info(logs)
         ])
-
 
     def get_task_info(self, task):
         """

@@ -11,7 +11,6 @@ from stl.time import Parser
 from stl.time import prettify_date, prettify_datetime
 
 
-
 """
 The default logging configuration to be used; it will be slightly altered if
 the verbose flag is set (see Core.__init__).
@@ -35,7 +34,6 @@ DEFAULT_LOGGING = {
         'level': logging.INFO
     }
 }
-
 
 
 class Core:
@@ -69,7 +67,6 @@ class Core:
 
         self.db = Database(self.dir_path)
 
-
     def _get_dir_path(self):
         """
         Returns the path to the dir that contains the database files, either
@@ -96,7 +93,6 @@ class Core:
 
         return dir_path
 
-
     def start(self, task='', now=None):
         """
         Adds a record that work is starting on the given task. The latter can
@@ -117,7 +113,6 @@ class Core:
             s += ' on '+task
 
         return s
-
 
     def stop(self, now=None):
         """
@@ -145,7 +140,6 @@ class Core:
 
         return s
 
-
     def switch(self, task='', now=None):
         """
         Shortcut that stops the current task and immediately starts a new one.
@@ -154,7 +148,6 @@ class Core:
         res_start = self.start(task, now=now)
 
         return '\n'.join([res_stop, res_start])
-
 
     def status(self, extra=None, now=None):
         """
@@ -192,7 +185,6 @@ class Core:
             d1, d2 = parser.extract_span(value)
             return status.get_span_info(d1, d2)
 
-
     def add(self, start, stop, task=''):
         """
         Adds a time log to the database. Expects either ISO format strings or
@@ -225,7 +217,6 @@ class Core:
             'start: {}'.format(prettify_datetime(start)),
             'stop: {}'.format(prettify_datetime(stop))
         ])
-
 
     def edit(self, month):
         """
